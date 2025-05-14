@@ -1,7 +1,6 @@
 package files
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"math/rand"
@@ -10,10 +9,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-)
-
-var (
-	ErrUserHomeNotFound = errors.New("Users home directory not found")
 )
 
 func IsFullPath(path string) bool {
@@ -26,10 +21,10 @@ func IsFullPath(path string) bool {
 
 func PathExists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		slog.Debug("PathExist - NOT EXIST: " + path)
+		slog.Debug("Path does not exist: " + path)
 		return false
 	}
-	slog.Debug("PathExist: " + path)
+	slog.Debug("Path exists: " + path)
 	return true
 }
 
@@ -83,7 +78,7 @@ func IsFileFresh(filepath string, expirySeconds int) bool {
 func GetRandomLine(filename string) (string, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %w", err)
+		return "", fmt.Errorf("Failed to read file: %w", err)
 	}
 
 	lines := strings.Split(string(content), "\n")
@@ -96,7 +91,7 @@ func GetRandomLine(filename string) (string, error) {
 	}
 
 	if len(nonEmptyLines) == 0 {
-		return "", fmt.Errorf("no wallpapers found")
+		return "", fmt.Errorf("No wallpapers found")
 	}
 
 	return nonEmptyLines[rand.Intn(len(nonEmptyLines))], nil
