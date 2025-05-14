@@ -38,7 +38,7 @@ func load(filepath string) (*Config, error) {
 	cfg := &Config{values: make(map[string]any)}
 
 	for key, value := range raw {
-		envKey := "WMCR_" + strings.ToUpper(key)
+		envKey := "WALLCHEMY_" + strings.ToUpper(key)
 		if envVal, exists := os.LookupEnv(envKey); exists {
 			value = convertType(value, envVal)
 		}
