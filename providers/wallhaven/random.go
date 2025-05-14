@@ -1,0 +1,123 @@
+package wallhaven
+
+import (
+	"errors"
+	"log/slog"
+	"path/filepath"
+	"strings"
+
+	"github.com/davenicholson-xyz/wallchemy/appcontext"
+	"github.com/davenicholson-xyz/wallchemy/download"
+	"github.com/davenicholson-xyz/wallchemy/files"
+)
+
+func SelectionFromRandom(app *appcontext.AppContext) (string, error) {
+	lm := download.NewLinkManager()
+	app.AddLinkManager(lm)
+
+	slog.Debug("Selection from collection")
+
+	url := download.NewURL("https://wallhaven.cc/api/v1/search")
+	app.AddURLBuilder(url)
+
+	seed := app.Config.GetStringWithDefault("seed", download.GenerateSeed(6))
+	app.URLBuilder.AddString("seed", seed)
+
+	apikey := app.Config.GetString("apikey")
+	if apikey != "" {
+		app.URLBuilder.AddString("apikey", apikey)
+	}
+
+	url.SetString("purity", "100")
+	if app.Config.GetBool("nsfw") {
+		app.URLBuilder.SetString("purity", "111")
+	}
+
+	url.SetString("categories", "111")
+	if app.Config.GetBool("noanime") {
+		app.URLBuilder.SetString("categories", "101")
+	}
+
+	random := app.Config.GetString("random")
+	if random != "" {
+		app.URLBuilder.SetString("sorting", "random")
+		app.URLBuilder.AddString("q", random)
+	}
+
+	if app.Config.GetBool("hot") {
+		url.SetString("sorting", "hot")
+	}
+
+	if app.Config.GetBool("top") {
+		app.URLBuilder.SetString("sorting", "toplist")
+	}
+
+	err := getRandom(app)
+	if err != nil {
+		return "", err
+	}
+
+	outfile := app.URLBuilder.GetString("sorting")
+	selected, _ := files.GetRandomLine(app.CacheTools.Join("wallhaven", outfile))
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	return selected, nil
+}
+
+func getRandom(app *appcontext.AppContext) error {
+
+	sorting := app.URLBuilder.GetString("sorting")
+	cleanUrl := app.URLBuilder.Without("apikey").Without("seed")
+	query_url := cleanUrl.Build()
+
+	if sorting == "random" {
+		slog.Debug("ssorting is random")
+		if files.PathExists(app.CacheTools.Join("wallhaven", "last_query")) {
+			slog.Debug("last_query does exist")
+			last_query, err := app.CacheTools.ReadLineFromFile("wallhaven/last_query", 1)
+			if err != nil {
+				return err
+			}
+
+			if last_query == query_url {
+				slog.Debug("last query = query_url")
+				if files.IsFileFresh(app.CacheTools.Join(filepath.Join("wallhaven", sorting)), app.Config.GetIntWithDefault("expiry", 600)) {
+					slog.Debug("Using cached results")
+					return nil
+				}
+			}
+		}
+	} else {
+		if files.IsFileFresh(app.CacheTools.Join(filepath.Join("wallhaven", sorting)), app.Config.GetIntWithDefault("expiry", 600)) {
+			slog.Debug("Using cached results")
+			return nil
+		}
+	}
+
+	lm := download.NewLinkManager()
+	app.AddLinkManager(lm)
+
+	err := processQuery(app)
+	if err != nil {
+		return err
+	}
+
+	if app.LinkManager.Count() == 0 {
+		return errors.New("No wallpapers found")
+	}
+
+	err = app.CacheTools.WriteStringToFile(filepath.Join("wallhaven", "last_query"), query_url)
+	if err != nil {
+		return err
+	}
+
+	all_links := strings.Join(app.LinkManager.GetLinks(), "\n")
+	err = app.CacheTools.WriteStringToFile(filepath.Join("wallhaven", sorting), all_links)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
