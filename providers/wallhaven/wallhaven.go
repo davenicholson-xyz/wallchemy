@@ -28,7 +28,6 @@ type WallhavenMeta struct {
 }
 
 func CurrentWallpaperInfo(app *appcontext.AppContext, line int) string {
-	app.Config.Override("verbose", true)
 	current := fmt.Sprintf("wallhaven/%s", "current")
 
 	slog.Debug("output info from " + current)

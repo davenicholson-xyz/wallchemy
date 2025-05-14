@@ -54,7 +54,7 @@ func runApp() (string, error) {
 
 	flg.DefineString("script", "", "script to set wallpaper")
 	flg.DefineBool("stealth", false, "do not change wallpaper")
-	flg.DefineBool("verbose", false, "output the fetched filename")
+	flg.DefineBool("silent", false, "does not output the filename")
 	flg.DefineBool("file", false, "output the filename of the current wallpaper")
 	flg.DefineBool("url", false, "output the url of the current wallpaper")
 	flg.DefineBool("link", false, "output the provider link of the current wallpaper")
@@ -118,9 +118,9 @@ func runApp() (string, error) {
 		return "", fmt.Errorf("%w", err)
 	}
 
-	if app.Config.GetBool("verbose") {
-		return result, nil
-	} else {
+	if app.Config.GetBool("silent") {
 		return "", nil
+	} else {
+		return result, nil
 	}
 }
