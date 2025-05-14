@@ -20,6 +20,9 @@ func main() {
 		slog.SetLogLoggerLevel(slog.LevelError)
 	}
 
+	var version = "undefined"
+	fmt.Println(version)
+
 	result, err := runApp()
 	if err != nil {
 		fmt.Printf("%s\n", err)
@@ -62,12 +65,22 @@ func runApp() (string, error) {
 
 	flg.DefineBool("clear", false, "clear the wallchemy cache")
 
+	flg.DefineBool("version", false, "version")
+	flg.DefineBool("v", false, "version")
+
 	flgValues := flg.Collect()
 
+	_, version_ok := flgValues["version"]
+	_, v_ok := flgValues["v"]
+
+	if version_ok || v_ok {
+		return app.Version, nil
+	}
+
 	var configPath string
-	val, ok := flgValues["config"].(string)
+	cfgVal, ok := flgValues["config"].(string)
 	if ok {
-		configPath = val
+		configPath = cfgVal
 		if !files.PathExists(configPath) {
 			return "", fmt.Errorf("config file does not exist")
 		}

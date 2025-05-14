@@ -11,10 +11,14 @@ type AppContext struct {
 	CacheTools  *cachetools.CacheTools
 	URLBuilder  *download.URLBuilder
 	LinkManager *download.LinkManager
+	Version     string
 }
 
 func NewAppContext() *AppContext {
-	return &AppContext{}
+	var version = "undefined"
+	return &AppContext{
+		Version: version,
+	}
 }
 
 func (app *AppContext) AddConfig(cfg *config.Config) {
