@@ -51,6 +51,7 @@ func runApp() (string, error) {
 	flg.DefineString("random", "", "query for random wallpaper")
 	flg.DefineBool("hot", false, "hot")
 	flg.DefineBool("top", false, "toplist")
+	flg.DefineString("id", "", "fetch wallpaper with ID")
 
 	flg.DefineString("script", "", "script to set wallpaper")
 	flg.DefineBool("stealth", false, "do not change wallpaper")

@@ -44,6 +44,13 @@ func (w *WallhavenProvider) ParseArgs(app *appcontext.AppContext) (string, error
 		}
 	}
 
+	if app.Config.GetString("id") != "" {
+		selection, err = wh.SelectionFromID(app)
+		if err != nil {
+			return "", fmt.Errorf("%w", err)
+		}
+	}
+
 	if selection != "" {
 		output, err := wh.SetSelectedWallpaper(selection, app)
 		if err != nil {
