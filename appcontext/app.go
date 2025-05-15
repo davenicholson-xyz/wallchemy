@@ -15,10 +15,7 @@ type AppContext struct {
 }
 
 func NewAppContext() *AppContext {
-	var version = "undefined"
-	return &AppContext{
-		Version: version,
-	}
+	return &AppContext{}
 }
 
 func (app *AppContext) AddConfig(cfg *config.Config) {

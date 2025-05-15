@@ -12,6 +12,8 @@ import (
 	"github.com/davenicholson-xyz/wallchemy/providers"
 )
 
+var version = "version"
+
 func main() {
 
 	if os.Getenv("DEBUG") != "" {
@@ -19,9 +21,6 @@ func main() {
 	} else {
 		slog.SetLogLoggerLevel(slog.LevelError)
 	}
-
-	var version = "undefined"
-	fmt.Println(version)
 
 	result, err := runApp()
 	if err != nil {
@@ -74,7 +73,7 @@ func runApp() (string, error) {
 	_, v_ok := flgValues["v"]
 
 	if version_ok || v_ok {
-		return app.Version, nil
+		return version, nil
 	}
 
 	var configPath string
