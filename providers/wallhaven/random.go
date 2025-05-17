@@ -72,8 +72,10 @@ func getRandom(app *appcontext.AppContext) error {
 	cleanUrl := app.URLBuilder.Without("apikey").Without("seed")
 	query_url := cleanUrl.Build()
 
+	// TODO: Check last query for all sorting types - incase of parameter chagne in URL
+
 	if sorting == "random" {
-		slog.Debug("ssorting is random")
+		slog.Debug("sorting is random")
 		if files.PathExists(app.CacheTools.Join("wallhaven", "last_query")) {
 			slog.Debug("last_query does exist")
 			last_query, err := app.CacheTools.ReadLineFromFile("wallhaven/last_query", 1)
