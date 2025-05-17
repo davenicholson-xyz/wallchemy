@@ -22,21 +22,6 @@ func main() {
 		slog.SetLogLoggerLevel(slog.LevelError)
 	}
 
-	result, err := runApp()
-	if err != nil {
-		fmt.Printf("%s\n", err)
-		os.Exit(1)
-	}
-
-	if result != "" {
-		fmt.Println(result)
-	}
-
-}
-
-func runApp() (string, error) {
-	app := appcontext.NewAppContext()
-
 	flg := config.NewFlagSet()
 
 	flg.DefineString("config", "", "Path to config file")
@@ -74,8 +59,24 @@ func runApp() (string, error) {
 	_, version_ok := flgValues["version"]
 
 	if version_ok {
-		return version, nil
+		fmt.Println(version)
+		os.Exit(0)
 	}
+
+	result, err := RunApp(flgValues)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		os.Exit(1)
+	}
+
+	if result != "" {
+		fmt.Println(result)
+	}
+
+}
+
+func RunApp(flgValues map[string]any) (string, error) {
+	app := appcontext.NewAppContext()
 
 	var configPath string
 	cfgVal, ok := flgValues["config"].(string)
