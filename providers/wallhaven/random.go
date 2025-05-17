@@ -31,6 +31,9 @@ func SelectionFromRandom(app *appcontext.AppContext) (string, error) {
 	}
 
 	url.SetString("purity", "100")
+	if app.Config.GetBool("sketchy") {
+		app.URLBuilder.SetString("purity", "110")
+	}
 	if app.Config.GetBool("nsfw") {
 		app.URLBuilder.SetString("purity", "111")
 	}

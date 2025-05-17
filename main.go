@@ -44,7 +44,7 @@ func runApp() (string, error) {
 
 	flg.DefineString("username", "", "wallhaven.cc username")
 	flg.DefineString("apikey", "", "wallhaven.cc api key")
-	// TODO: Add a risky flag
+	flg.DefineBool("sketchy", false, "Fetch sketchy images")
 	flg.DefineBool("nsfw", false, "Fetch NSFW images")
 	flg.DefineBool("noanime", false, "Dont fetch anima wallpaper")
 	flg.DefineString("seed", "", "Random seed for search")
@@ -62,6 +62,7 @@ func runApp() (string, error) {
 	flg.DefineBool("file", false, "Output the filename of the current wallpaper")
 	flg.DefineBool("url", false, "Output the url of the current wallpaper")
 	flg.DefineBool("link", false, "Output the provider link of the current wallpaper")
+	// TODO: last - return last random query
 
 	flg.DefineBool("clear", false, "Clear the wallchemy cache")
 
