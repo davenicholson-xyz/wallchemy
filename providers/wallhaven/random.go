@@ -2,8 +2,10 @@ package wallhaven
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
@@ -72,29 +74,24 @@ func getRandom(app *appcontext.AppContext) error {
 	cleanUrl := app.URLBuilder.Without("apikey").Without("seed")
 	query_url := cleanUrl.Build()
 
+	slog.Debug("query_url: " + query_url)
+
 	// TODO: Check last query for all sorting types - incase of parameter chagne in URL
 
-	if sorting == "random" {
-		slog.Debug("sorting is random")
-		if files.PathExists(app.CacheTools.Join("wallhaven", "last_query")) {
-			slog.Debug("last_query does exist")
-			last_query, err := app.CacheTools.ReadLineFromFile("wallhaven/last_query", 1)
-			if err != nil {
-				return err
-			}
-
-			if last_query == query_url {
-				slog.Debug("last query = query_url")
-				if files.IsFileFresh(app.CacheTools.Join(filepath.Join("wallhaven", sorting)), app.Config.GetIntWithDefault("expiry", 600)) {
-					slog.Debug("Using cached results")
-					return nil
-				}
-			}
+	last_file := fmt.Sprintf("%s_query", sorting)
+	if files.PathExists(app.CacheTools.Join("wallhaven", last_file)) {
+		slog.Debug(last_file + " does exist")
+		last_query, err := app.CacheTools.ReadLineFromFile("wallhaven/"+last_file, 1)
+		slog.Debug("last_query: " + last_query)
+		if err != nil {
+			return err
 		}
-	} else {
-		if files.IsFileFresh(app.CacheTools.Join(filepath.Join("wallhaven", sorting)), app.Config.GetIntWithDefault("expiry", 600)) {
-			slog.Debug("Using cached results")
-			return nil
+		if last_query == query_url {
+			slog.Debug("last query = query_url")
+			if files.IsFileFresh(app.CacheTools.Join(filepath.Join("wallhaven", sorting)), app.Config.GetIntWithDefault("expiry", 600)) {
+				slog.Debug("Using cached results")
+				return nil
+			}
 		}
 	}
 
@@ -110,13 +107,16 @@ func getRandom(app *appcontext.AppContext) error {
 		return errors.New("No wallpapers found")
 	}
 
-	err = app.CacheTools.WriteStringToFile(filepath.Join("wallhaven", "last_query"), query_url)
+	err = app.CacheTools.WriteStringToFile(filepath.Join("wallhaven", sorting+"_query"), query_url)
 	if err != nil {
 		return err
 	}
 
-	all_links := strings.Join(app.LinkManager.GetLinks(), "\n")
-	err = app.CacheTools.WriteStringToFile(filepath.Join("wallhaven", sorting), all_links)
+	all_links := app.LinkManager.GetLinks()
+	slog.Debug("Links found: " + strconv.Itoa(len(all_links)))
+
+	links_str := strings.Join(app.LinkManager.GetLinks(), "\n")
+	err = app.CacheTools.WriteStringToFile(filepath.Join("wallhaven", sorting), links_str)
 	if err != nil {
 		return err
 	}
