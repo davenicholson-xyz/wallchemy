@@ -9,6 +9,7 @@ import (
 type URLBuilder struct {
 	baseURL string
 	values  url.Values
+	extras  string
 }
 
 func NewURL(baseURL string) *URLBuilder {
@@ -105,12 +106,24 @@ func (u *URLBuilder) Has(key string) bool {
 	return exists
 }
 
+func (u *URLBuilder) AddExtras(extras string) {
+	u.extras = extras
+}
+
 // Build the final URL string
 func (u *URLBuilder) Build() string {
 	if len(u.values) == 0 {
-		return u.baseURL
+		if u.extras != "" {
+			return u.baseURL + "?" + u.extras
+		} else {
+			return u.baseURL
+		}
 	}
-	return u.baseURL + "?" + u.values.Encode()
+	if u.extras != "" {
+		return u.baseURL + "?" + u.values.Encode() + "&" + u.extras
+	} else {
+		return u.baseURL + "?" + u.values.Encode()
+	}
 }
 
 func (u *URLBuilder) BuildWithout(key string) string {
@@ -121,10 +134,18 @@ func (u *URLBuilder) BuildWithout(key string) string {
 		}
 	}
 
-	if len(newValues) == 0 {
-		return u.baseURL
+	if len(u.values) == 0 {
+		if u.extras != "" {
+			return u.baseURL + "?" + u.extras
+		} else {
+			return u.baseURL
+		}
 	}
-	return u.baseURL + "?" + newValues.Encode()
+	if u.extras != "" {
+		return u.baseURL + "?" + u.values.Encode() + "&" + u.extras
+	} else {
+		return u.baseURL + "?" + u.values.Encode()
+	}
 }
 
 func (u *URLBuilder) Without(key string) *URLBuilder {
@@ -145,6 +166,8 @@ func (u *URLBuilder) Clone() *URLBuilder {
 	for k, v := range u.values {
 		clone.values[k] = append([]string{}, v...)
 	}
+
+	clone.extras = u.extras
 
 	return clone
 }

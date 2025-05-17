@@ -49,6 +49,7 @@ func runApp() (string, error) {
 	flg.DefineBool("noanime", false, "Dont fetch anima wallpaper")
 	flg.DefineString("seed", "", "Random seed for search")
 	flg.DefineInt("expiry", 0, "Cache expiry in seconds")
+	flg.DefineString("extras", "", "Add the the query string")
 
 	flg.DefineString("collection", "", "Users collection to select from")
 	flg.DefineString("random", "", "Query for random wallpaper")

@@ -57,6 +57,9 @@ func SelectionFromRandom(app *appcontext.AppContext) (string, error) {
 		app.URLBuilder.SetString("sorting", "toplist")
 	}
 
+	extras := app.Config.GetString("extras")
+	app.URLBuilder.AddExtras(extras)
+
 	err := getRandom(app)
 	if err != nil {
 		return "", err
