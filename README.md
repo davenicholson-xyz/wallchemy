@@ -2,6 +2,9 @@
 
 Wallchemy is a CLI tool written in Go for fetching random wallpapers from [wallhaven.cc](https://wallhaven.cc/). Wallchemy will randomly choose a wallpaper from various lists including your own collections using your API key. Wallchemy will set the wallpaper on your desktop on Windows, Mac and many Linux desktop environments. 
 
+[![Release](https://img.shields.io/github/release/davenicholson-xyz/wallchemy.svg)](https://github.com/davenicholson-xyz/wallchemy/releases/latest)
+[![Platforms](https://img.shields.io/badge/platforms-linux%20|%20macos%20|%20windows-blue)]()
+
 ### Supported desktop environments
 
 - Windows
