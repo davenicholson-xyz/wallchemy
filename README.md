@@ -23,6 +23,23 @@ All queries and selected wallpapers are cached to cut down on API calls.
 
 ### Installation
 
+See the releases page for suitable executable for your system. Alternatively you can run one of the install scripts.
+
+#### Linux/Mac
+
+
+```sh
+curl -sSL https://raw.githubusercontent.com/davenicholson-xyz/wallchemy/main/install.sh | bash
+
+```
+
+#### Windows
+
+```
+irm https://raw.githubusercontent.com/davenicholson-xyz/wallchemy/main/install.ps1 | iex
+
+```
+
 ---
 
 ### Configuration 
@@ -56,7 +73,7 @@ Path to config file to use if not using default config path
 wallhaven.cc username. Required to fetch from your collections
 
 #### `-apikey` [apikey]
-wallhaven.cc apikey to fetch NSFW images
+wallhaven.cc apikey to fetch collections and NSFW images
 
 #### `-collection` [name]
 Name of collection to fetch random wallpaper from. Requires API key and username to be set
@@ -69,6 +86,12 @@ Select a random image wallpaper from the most popular wallpapers in a time range
 
 #### `-hot`
 Choose a random wallpaper from the most popular wallpapers right now!
+
+#### `-sketchy`
+Return sketchy results from random, hot and top searches
+
+#### `-nsfw`
+Return sketchy results from random, hot and top searches (API key required)
 
 #### `-id [wallhaven id]`
 Sets wallpaper using the wallhaven.cc wallpaper ID
@@ -90,7 +113,6 @@ Returns the current file path of the last wallpaper set with wallhwaven
 
 #### `-url`
 Return the wallhaven.cc link to the last wallpaper set with wallchemy
-
 
 #### `-clear`
 Deletes cache files
