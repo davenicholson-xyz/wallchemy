@@ -30,14 +30,12 @@ See the releases page for suitable executable for your system. Alternatively you
 
 ```sh
 curl -sSL https://raw.githubusercontent.com/davenicholson-xyz/wallchemy/main/install.sh | bash
-
 ```
 
 #### Windows
 
 ```
 irm https://raw.githubusercontent.com/davenicholson-xyz/wallchemy/main/install.ps1 | iex
-
 ```
 
 ---
