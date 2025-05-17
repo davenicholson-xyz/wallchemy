@@ -45,6 +45,20 @@ func load(filepath string) (*Config, error) {
 		cfg.values[key] = value
 	}
 
+	for _, env := range os.Environ() {
+		parts := strings.SplitN(env, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		envKey, envVal := parts[0], parts[1]
+		if strings.HasPrefix(envKey, "WALLCHEMY_") {
+			configKey := strings.ToLower(strings.TrimPrefix(envKey, "WALLCHEMY_"))
+			if _, exists := cfg.values[configKey]; !exists {
+				cfg.values[configKey] = guessType(envVal)
+			}
+		}
+	}
+
 	return cfg, nil
 }
 
@@ -143,4 +157,17 @@ func (c *Config) FlagOverride(overrides map[string]any) {
 	for k, v := range overrides {
 		c.values[k] = v
 	}
+}
+
+func guessType(val string) any {
+	if b, err := strconv.ParseBool(val); err == nil {
+		return b
+	}
+	if i, err := strconv.Atoi(val); err == nil {
+		return i
+	}
+	if f, err := strconv.ParseFloat(val, 64); err == nil {
+		return f
+	}
+	return val
 }
