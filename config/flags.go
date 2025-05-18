@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"os"
 )
 
@@ -58,4 +59,22 @@ func (f *FlagSet) Collect() map[string]any {
 	}
 
 	return result
+}
+
+func (f *FlagSet) String() string {
+	f.flags.Parse(os.Args[1:]) // Ensure flags are parsed
+	output := ""
+
+	for name, ptr := range f.values {
+		switch v := ptr.(type) {
+		case *string:
+			output += name + "=" + *v + " "
+		case *int:
+			output += name + "=" + fmt.Sprintf("%d", *v) + " "
+		case *bool:
+			output += name + "=" + fmt.Sprintf("%t", *v) + " "
+		}
+	}
+
+	return output
 }
