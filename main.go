@@ -24,6 +24,9 @@ func main() {
 	flg.DefineString("config", "", "Path to config file")
 	flg.DefineString("provider", "wallhaven", "Wallpaper provider [wallhaven]")
 
+	flg.DefineBool("daemon", false, "Start the backgorund daemon")
+	flg.DefineBool("kill", false, "Kill the backgorund daemon")
+
 	flg.DefineString("username", "", "wallhaven.cc username")
 	flg.DefineString("apikey", "", "wallhaven.cc api key")
 	flg.DefineBool("sketchy", false, "Fetch sketchy images")
@@ -54,7 +57,6 @@ func main() {
 	flgValues := flg.Collect()
 
 	_, version_ok := flgValues["version"]
-
 	if version_ok {
 		fmt.Println(version)
 		os.Exit(0)

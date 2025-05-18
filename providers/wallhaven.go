@@ -15,6 +15,18 @@ func (w *WallhavenProvider) Name() string {
 
 func (w *WallhavenProvider) ParseArgs(app *appcontext.AppContext) (string, error) {
 
+	if app.Config.GetBool("daemon") {
+		wh.LaunchDaemon()
+	}
+
+	if app.Config.GetBool("kill") {
+		wh.KillDaemon(app)
+	}
+
+	if app.Config.GetBool("startdaemon") {
+		wh.StartDaemon(app)
+	}
+
 	if app.Config.GetBool("file") {
 		return wh.CurrentWallpaperInfo(app, 4), nil
 	}

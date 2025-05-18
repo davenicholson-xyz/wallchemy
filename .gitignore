@@ -2,3 +2,4 @@ build
 build.sh
 wallchemy
 .DS_Store
+wallchemy.pid
