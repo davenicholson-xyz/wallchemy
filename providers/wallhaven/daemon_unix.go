@@ -15,6 +15,7 @@ import (
 )
 
 func LaunchDaemon() error {
+
 	execPath, err := os.Executable()
 	if err != nil {
 		return fmt.Errorf("could not determine executable path: %w", err)
