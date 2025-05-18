@@ -81,6 +81,14 @@ func (ct *CacheTools) ReadLineFromFile(filename string, line int) (string, error
 	return "", nil
 }
 
+func (ct *CacheTools) DeleteFile(filename string) error {
+	fullPath := filepath.Join(ct.GetCacheDirectory(), filename)
+	if err := os.Remove(fullPath); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (ct *CacheTools) ReadFile(filename string) (string, error) {
 	fullPath := filepath.Join(ct.GetCacheDirectory(), filename)
 	b, err := os.ReadFile(fullPath)
