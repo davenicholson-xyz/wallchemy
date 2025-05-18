@@ -5,7 +5,6 @@ package wallhaven
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -45,28 +44,31 @@ func LaunchDaemon() error {
 
 	os.Exit(0)
 
-	return nil // unreachable but included for completeness
+	return nil
 
 }
 
 func KillDaemon(app *appcontext.AppContext) error {
 	data, err := app.CacheTools.ReadLineFromFile("daemon.pid", 1)
 	if err != nil {
-		log.Fatalf("Failed to read PID file: %v", err)
+		return nil
 	}
 
 	pid, err := strconv.Atoi(strings.TrimSpace(string(data)))
 	if err != nil {
-		return fmt.Errorf("invalid PID in file: %w", err)
+		return nil
+		// return fmt.Errorf("invalid PID in file: %w", err)
 	}
 
 	process, err := os.FindProcess(pid)
 	if err != nil {
-		return fmt.Errorf("failed to find process with PID %d: %w", pid, err)
+		return nil
+		// return fmt.Errorf("failed to find process with PID %d: %w", pid, err)
 	}
 
 	if err := process.Kill(); err != nil {
-		return fmt.Errorf("failed to kill process: %w", err)
+		return nil
+		// return fmt.Errorf("failed to kill process: %w", err)
 	}
 
 	app.CacheTools.DeleteFile("daemon.pid")

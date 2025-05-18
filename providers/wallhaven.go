@@ -2,6 +2,10 @@ package providers
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"syscall"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
 	wh "github.com/davenicholson-xyz/wallchemy/providers/wallhaven"
@@ -13,9 +17,39 @@ func (w *WallhavenProvider) Name() string {
 	return "wallhaven"
 }
 
+func isDaemonRunning(app *appcontext.AppContext) (bool, int) {
+	data, err := app.CacheTools.ReadLineFromFile("daemon.pid", 1)
+	if err != nil {
+		return false, 0 // PID file doesn't exist
+	}
+
+	pid, err := strconv.Atoi(strings.TrimSpace(data))
+	if err != nil {
+		return false, 0 // Invalid PID
+	}
+
+	// Try to signal the process with 0 (doesn't kill it, just checks if it's there)
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return false, 0
+	}
+
+	err = process.Signal(syscall.Signal(0))
+	if err != nil {
+		return false, 0
+	}
+
+	return true, pid
+}
+
 func (w *WallhavenProvider) ParseArgs(app *appcontext.AppContext) (string, error) {
 
 	if app.Config.GetBool("daemon") {
+		running, pid := isDaemonRunning(app)
+		if running {
+			fmt.Printf("Daemon is already running with PID %d\n", pid)
+			return "", nil
+		}
 		wh.LaunchDaemon()
 	}
 
