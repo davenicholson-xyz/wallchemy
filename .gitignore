@@ -3,3 +3,4 @@ build.sh
 wallchemy
 .DS_Store
 wallchemy.pid
+wallchemy.log
