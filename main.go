@@ -26,6 +26,7 @@ func main() {
 
 	flg.DefineBool("daemon", false, "Start the background daemon")
 	flg.DefineBool("kill", false, "Kill the background daemon")
+	//TODO: flg.DefineInt("port", 2388, "Port to launch daemon listener on")
 
 	flg.DefineString("username", "", "wallhaven.cc username")
 	flg.DefineString("apikey", "", "wallhaven.cc api key")

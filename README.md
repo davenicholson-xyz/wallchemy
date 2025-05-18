@@ -118,8 +118,11 @@ Return the wallhaven.cc link to the last wallpaper set with wallchemy
 #### `-clear`
 Deletes cache files
 
-#### `-version`
-Version info
+#### `-daemon`
+Start the wallchemy background daemon (for use with the Chrome extension)
+
+#### `-kill`
+Kill the wallchemy background daemon
 
 ---
 
