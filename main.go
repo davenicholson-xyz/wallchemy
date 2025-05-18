@@ -24,8 +24,8 @@ func main() {
 	flg.DefineString("config", "", "Path to config file")
 	flg.DefineString("provider", "wallhaven", "Wallpaper provider [wallhaven]")
 
-	flg.DefineBool("daemon", false, "Start the backgorund daemon")
-	flg.DefineBool("kill", false, "Kill the backgorund daemon")
+	flg.DefineBool("daemon", false, "Start the background daemon")
+	flg.DefineBool("kill", false, "Kill the background daemon")
 
 	flg.DefineString("username", "", "wallhaven.cc username")
 	flg.DefineString("apikey", "", "wallhaven.cc api key")
