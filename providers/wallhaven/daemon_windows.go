@@ -5,7 +5,6 @@ package wallhaven
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
