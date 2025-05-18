@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
 )
@@ -15,7 +17,6 @@ func StartDaemon(app *appcontext.AppContext) {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, you've requested: %s\n", r.URL.Path)
-		// var flgValues = make(map[string]any)
 		// flgValues["id"] = "4y2wmd"
 	})
 
@@ -33,8 +34,13 @@ func StartDaemon(app *appcontext.AppContext) {
 	}()
 
 	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
-	log.Println("Shutting down server...")
+	log.Println("Daemon shutting down")
+
+	// quit := make(chan os.Signal, 1)
+	// <-quit
+	// log.Println("Shutting down server...")
 
 }
 
