@@ -18,7 +18,7 @@ func (w *WallhavenProvider) ParseArgs(app *appcontext.AppContext) (string, error
 
 	if app.Config.GetBool("daemon") {
 		wh.KillDaemon(app)
-		wh.LaunchDaemon()
+		wh.LaunchDaemon(app)
 	}
 
 	if app.Config.GetBool("kill") {

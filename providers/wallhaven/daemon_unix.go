@@ -15,7 +15,7 @@ import (
 	"github.com/davenicholson-xyz/wallchemy/logger"
 )
 
-func LaunchDaemon() error {
+func LaunchDaemon(app *appcontext.AppContext) error {
 
 	execPath, err := os.Executable()
 	if err != nil {
@@ -23,7 +23,9 @@ func LaunchDaemon() error {
 		return fmt.Errorf("could not determine executable path: %w", err)
 	}
 
-	cmd := exec.Command(execPath, "-startdaemon")
+	port := app.Config.GetIntWithDefault("port", 2388)
+
+	cmd := exec.Command(execPath, "-startdaemon", "-port", strconv.Itoa(port))
 	nullFile, err := os.OpenFile(os.DevNull, os.O_RDWR, 0)
 	if err != nil {
 		return fmt.Errorf("failed to open null device: %w", err)

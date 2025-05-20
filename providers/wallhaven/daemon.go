@@ -23,15 +23,15 @@ func enableCors(w *http.ResponseWriter) {
 
 func StartDaemon(app *appcontext.AppContext) {
 
-	os.Unsetenv("WALLCHEMY_STARTDAEMON")
-
 	go func() {
 		pid := os.Getpid()
+		port := app.Config.GetIntWithDefault("port", 2388)
+
 		err := app.CacheTools.WriteStringToFile("daemon.pid", strconv.Itoa(pid))
 		if err != nil {
 			log.Fatalf("Failed to write PID file: %v", err)
 		}
-		logger.Log.WithField("PID", pid).Info("Started daemon")
+		logger.Log.WithField("PID", pid).WithField("port", port).Info("Started daemon")
 		log.Printf("Daemon PID: %d\n", pid)
 
 		defer func() {
@@ -75,7 +75,9 @@ func StartDaemon(app *appcontext.AppContext) {
 
 		})
 
-		if err := http.ListenAndServe(":2388", mux); err != nil {
+		portStr := fmt.Sprintf(":%d", port)
+
+		if err := http.ListenAndServe(portStr, mux); err != nil {
 			log.Fatalf("Server failed to start: %v", err)
 		}
 
