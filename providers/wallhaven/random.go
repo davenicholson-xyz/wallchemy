@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/url"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -83,8 +84,6 @@ func getRandom(app *appcontext.AppContext) error {
 
 	slog.Debug("query_url: " + query_url)
 
-	// TODO: Check last query for all sorting types - incase of parameter chagne in URL
-
 	last_file := fmt.Sprintf("%s_query", sorting)
 	if files.PathExists(app.CacheTools.Join("wallhaven", last_file)) {
 		slog.Debug(last_file + " does exist")
@@ -129,4 +128,18 @@ func getRandom(app *appcontext.AppContext) error {
 	}
 
 	return nil
+}
+
+func LastRandomQuery(app *appcontext.AppContext) string {
+	lastUrl, err := app.CacheTools.ReadLineFromFile("wallhaven/random_query", 1)
+	if err != nil {
+		logger.Log.Warn("Could not read last query for random")
+	}
+	parsedUrl, err := url.Parse(lastUrl)
+	if err != nil {
+		logger.Log.Warn("Could not parse last query for random")
+	}
+	queryParams := parsedUrl.Query()
+	qValue := queryParams.Get("q")
+	return qValue
 }

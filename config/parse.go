@@ -32,7 +32,7 @@ func ParseFlags() map[string]any {
 	flg.DefineBool("file", false, "Output the filename of the current wallpaper")
 	flg.DefineBool("url", false, "Output the url of the current wallpaper")
 	flg.DefineBool("link", false, "Output the provider link of the current wallpaper")
-	// TODO: last - return last random query
+	flg.DefineBool("last", false, "Return the last query to random")
 
 	flg.DefineBool("clear", false, "Clear the wallchemy cache")
 

@@ -41,6 +41,10 @@ func (w *WallhavenProvider) ParseArgs(app *appcontext.AppContext) (string, error
 		return wh.CurrentWallpaperInfo(app, 2), nil
 	}
 
+	if app.Config.GetBool("last") {
+		return wh.LastRandomQuery(app), nil
+	}
+
 	var selection string
 	var err error
 
