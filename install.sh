@@ -45,6 +45,7 @@ chmod +x "$BINARY_NAME"
 INSTALL_PATH="/usr/local/bin/$BINARY_NAME"
 echo "Installing to $INSTALL_PATH"
 sudo mv "$BINARY_NAME" "$INSTALL_PATH"
+rm $FILE
 
-echo "✅ $BINARY_NAME installed successfully!"
+echo "$BINARY_NAME installed successfully!"
 
