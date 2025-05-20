@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log/slog"
 	"regexp"
+	"sync"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
 	"github.com/davenicholson-xyz/wallchemy/download"
 	"github.com/davenicholson-xyz/wallchemy/files"
+	"github.com/davenicholson-xyz/wallchemy/logger"
 )
 
 type WallpaperData struct {
@@ -66,22 +68,43 @@ func processQuery(app *appcontext.AppContext) error {
 	}
 
 	if last > 1 {
-		last_page := min(last, app.Config.GetIntWithDefault("max_pages", 5))
+		lastPage := min(last, app.Config.GetIntWithDefault("max_pages", 5))
 		if app.Config.GetString("collection") != "" {
-			last_page = last
+			lastPage = last
 		}
-		for page := 2; page <= last_page; page++ {
-			app.URLBuilder.SetInt("page", page)
-			_, err = processPage(app)
-			if err != nil {
-			}
+
+		var wg sync.WaitGroup
+		errChan := make(chan error, lastPage-1)
+
+		for page := 2; page <= lastPage; page++ {
+			wg.Add(1)
+			go func(p int) {
+				defer wg.Done()
+
+				localApp := *app
+				localApp.URLBuilder = app.URLBuilder.Clone()
+				localApp.URLBuilder.SetInt("page", p)
+
+				if _, err := processPage(&localApp); err != nil {
+					errChan <- fmt.Errorf("error grabbing page %d: %w", p, err)
+				}
+			}(page)
+		}
+
+		wg.Wait()
+		close(errChan)
+
+		if len(errChan) > 0 {
+			return <-errChan
 		}
 	}
+
 	return nil
 }
 
 func processPage(app *appcontext.AppContext) (int, error) {
 	request := app.URLBuilder.Build()
+	logger.Log.WithField("request", request).Debug("Proccessing page")
 
 	resp, err := download.FetchJson(request)
 	if err != nil {
