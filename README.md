@@ -1,5 +1,5 @@
 <p align="center">
-<img src="/images/logo.png" alt="wallchemy logo" />
+<img src="/images/logo.png" alt="wallchemy logo" width="140px"/>
 <h2>Wallchemy</h2>
 </p>
 
