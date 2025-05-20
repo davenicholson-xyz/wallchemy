@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$repo = "davenicholson-xyz/wallchemy"  # Change this
+$repo = "davenicholson-xyz/wallchemy" 
 $binaryName = "wallchemy"
 $arch = if ([Environment]::Is64BitOperatingSystem) { "amd64" } else { "386" }
 
