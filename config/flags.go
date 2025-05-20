@@ -7,15 +7,53 @@ import (
 )
 
 type FlagSet struct {
-	flags  *flag.FlagSet
-	values map[string]any
+	flags      *flag.FlagSet
+	values     map[string]any
+	hiddenFlag map[string]bool
 }
 
 func NewFlagSet() *FlagSet {
-	return &FlagSet{
-		flags:  flag.NewFlagSet(os.Args[0], flag.ExitOnError),
-		values: make(map[string]any),
+	fs := &FlagSet{
+		flags:      flag.NewFlagSet(os.Args[0], flag.ExitOnError),
+		values:     make(map[string]any),
+		hiddenFlag: make(map[string]bool),
 	}
+
+	fs.flags.Usage = func() {
+		maxLength := 0
+		fs.flags.VisitAll(func(f *flag.Flag) {
+			if !fs.hiddenFlag[f.Name] && len(f.Name) > maxLength {
+				maxLength = len(f.Name)
+			}
+		})
+
+		maxLength += 2
+
+		fmt.Fprintf(fs.flags.Output(), "Usage of %s:\n", "wallchemy")
+		fs.flags.VisitAll(func(f *flag.Flag) {
+			if !fs.hiddenFlag[f.Name] {
+				// Format with padding
+				fmt.Fprintf(fs.flags.Output(), "  -%-*s%s\n", maxLength, f.Name, f.Usage)
+			}
+		})
+	}
+
+	return fs
+}
+
+func (f *FlagSet) DefineStringHidden(name, value string) {
+	f.hiddenFlag[name] = true
+	f.DefineString(name, value, "")
+}
+
+func (f *FlagSet) DefineIntHidden(name string, value int) {
+	f.hiddenFlag[name] = true
+	f.DefineInt(name, value, "")
+}
+
+func (f *FlagSet) DefineBoolHidden(name string, value bool) {
+	f.hiddenFlag[name] = true
+	f.DefineBool(name, value, "")
 }
 
 func (f *FlagSet) DefineString(name, value, usage string) {
@@ -62,7 +100,7 @@ func (f *FlagSet) Collect() map[string]any {
 }
 
 func (f *FlagSet) String() string {
-	f.flags.Parse(os.Args[1:]) // Ensure flags are parsed
+	f.flags.Parse(os.Args[1:])
 	output := ""
 
 	for name, ptr := range f.values {

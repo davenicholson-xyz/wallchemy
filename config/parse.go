@@ -8,8 +8,9 @@ func ParseFlags() map[string]any {
 	flg.DefineString("provider", "wallhaven", "Wallpaper provider [wallhaven]")
 
 	flg.DefineBool("daemon", false, "Start the background daemon")
+	flg.DefineBoolHidden("startdaemon", false)
 	flg.DefineBool("kill", false, "Kill the background daemon")
-	//TODO: flg.DefineInt("port", 2388, "Port to launch daemon listener on")
+	flg.DefineInt("port", 0, "Port to launch daemon listener on")
 
 	flg.DefineString("username", "", "wallhaven.cc username")
 	flg.DefineString("apikey", "", "wallhaven.cc api key")

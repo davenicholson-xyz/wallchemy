@@ -23,8 +23,7 @@ func LaunchDaemon() error {
 		return fmt.Errorf("could not determine executable path: %w", err)
 	}
 
-	cmd := exec.Command(execPath)
-	cmd.Env = append(os.Environ(), "WALLCHEMY_STARTDAEMON=1")
+	cmd := exec.Command(execPath, "-startdaemon")
 	nullFile, err := os.OpenFile(os.DevNull, os.O_RDWR, 0)
 	if err != nil {
 		return fmt.Errorf("failed to open null device: %w", err)
