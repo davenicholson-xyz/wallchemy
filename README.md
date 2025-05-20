@@ -1,8 +1,7 @@
 <p align="center">
-![wallchemy logo](/images/logo.png)
+<img src="/images/logo.png" alt="wallchemy logo" />
 <h2>Wallchemy</h2>
 </p>
-
 
 Wallchemy is a CLI tool written in Go for fetching random wallpapers from [wallhaven.cc](https://wallhaven.cc/). Wallchemy will randomly choose a wallpaper from various lists including your own collections using your API key. Wallchemy will set the wallpaper on your desktop on Windows, Mac and many Linux desktop environments. 
 
