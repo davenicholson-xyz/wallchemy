@@ -95,7 +95,7 @@ func processQuery(app *appcontext.AppContext) error {
 		close(errChan)
 
 		if len(errChan) > 0 {
-			return <-errChan
+			logger.Log.Error(<-errChan)
 		}
 	}
 
