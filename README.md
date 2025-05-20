@@ -56,8 +56,6 @@ An example `config.yml` is in this [here](https://github.com/davenicholson-xyz/w
 
 ### Usage
 
-Call the `wallchemy` command and select an option to retrieve a random wallpaper.
-
 `wallchemy -collection name` will select a wallpaper from your collection with that name. Include your username and API key in the config/flags.
 
 `wallchemy -random search_term` will return wallpapers from that query. 
