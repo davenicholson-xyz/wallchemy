@@ -3,11 +3,12 @@ package download
 import (
 	"fmt"
 	"io"
-	"log/slog"
 	"math/rand"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/davenicholson-xyz/wallchemy/logger"
 )
 
 const (
@@ -17,10 +18,11 @@ const (
 )
 
 func FetchJson(url string) ([]byte, error) {
-	slog.Info("Fetching:" + url)
+	logger.Log.WithField("URL", url).Debug("Fetching url")
 
 	resp, err := http.Get(url)
 	if err != nil {
+		logger.Log.WithError(err)
 		return nil, fmt.Errorf("HTTP request failed: %w", err)
 	}
 
@@ -28,6 +30,7 @@ func FetchJson(url string) ([]byte, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		logger.Log.WithError(err)
 		return nil, fmt.Errorf("Failed to read response body: %w", err)
 	}
 
@@ -55,6 +58,7 @@ func GenerateSeed(length int) string {
 }
 
 func DownloadImage(url string, output string) error {
+	logger.Log.WithField("Image url:", url).Info("Downloading image")
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("%w", err)

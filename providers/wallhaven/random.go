@@ -11,13 +11,14 @@ import (
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
 	"github.com/davenicholson-xyz/wallchemy/download"
 	"github.com/davenicholson-xyz/wallchemy/files"
+	"github.com/davenicholson-xyz/wallchemy/logger"
 )
 
 func SelectionFromRandom(app *appcontext.AppContext) (string, error) {
 	lm := download.NewLinkManager()
 	app.AddLinkManager(lm)
 
-	slog.Debug("Selection from collection")
+	logger.Log.Info("Selecting from random")
 
 	url := download.NewURL("https://wallhaven.cc/api/v1/search")
 	app.AddURLBuilder(url)

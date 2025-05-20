@@ -2,13 +2,14 @@ package files
 
 import (
 	"fmt"
-	"log/slog"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/davenicholson-xyz/wallchemy/logger"
 )
 
 func IsFullPath(path string) bool {
@@ -21,10 +22,9 @@ func IsFullPath(path string) bool {
 
 func PathExists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		slog.Debug("Path does not exist: " + path)
+		logger.Log.WithField("path", path).Debug("Path does not exist")
 		return false
 	}
-	slog.Debug("Path exists: " + path)
 	return true
 }
 
