@@ -23,7 +23,7 @@ func init() {
 	}
 
 	Log.SetFormatter(&logrus.JSONFormatter{})
-	Log.SetLevel(logrus.DebugLevel)
+	Log.SetLevel(logrus.InfoLevel)
 }
 
 func getLogPath(appName string) string {

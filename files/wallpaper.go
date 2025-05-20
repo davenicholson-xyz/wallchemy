@@ -2,7 +2,6 @@ package files
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,6 +9,7 @@ import (
 	"github.com/davenicholson-xyz/go-setwallpaper/wallpaper"
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
 	"github.com/davenicholson-xyz/wallchemy/download"
+	"github.com/davenicholson-xyz/wallchemy/logger"
 )
 
 func ApplyWallpaper(wp string, app *appcontext.AppContext) (string, error) {
@@ -18,9 +18,9 @@ func ApplyWallpaper(wp string, app *appcontext.AppContext) (string, error) {
 	output := app.CacheTools.Join(app.Config.GetString("provider"), filename)
 
 	if PathExists(output) {
-		slog.Debug(output + " already exists. using cached version")
+		logger.Log.WithField("output", output).Debug("Already esists. Using cached")
 	} else {
-		slog.Debug(output + " is new. fetching")
+		logger.Log.WithField("output", output).Debug("Not in cache. Fetching")
 		err := download.DownloadImage(wp, output)
 		if err != nil {
 			return "", fmt.Errorf("%w", err)
@@ -33,6 +33,7 @@ func ApplyWallpaper(wp string, app *appcontext.AppContext) (string, error) {
 
 	script := app.Config.GetString("script")
 	if script != "" {
+		logger.Log.WithField("script", script).Debug("Setting wallpaper with script")
 		cmd := exec.Command("sh", "-c", script+" "+output)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -41,7 +42,7 @@ func ApplyWallpaper(wp string, app *appcontext.AppContext) (string, error) {
 			return "", err
 		}
 	} else {
-		slog.Debug("Setting wallpaper with built in")
+		logger.Log.Debug("Setting wallpaper with built-in")
 		wallpaper.Set(output)
 	}
 

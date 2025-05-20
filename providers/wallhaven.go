@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
+	"github.com/davenicholson-xyz/wallchemy/logger"
 	wh "github.com/davenicholson-xyz/wallchemy/providers/wallhaven"
 )
 
@@ -65,6 +66,7 @@ func (w *WallhavenProvider) ParseArgs(app *appcontext.AppContext) (string, error
 	}
 
 	if selection != "" {
+		logger.Log.WithField("selected", selection).Info("Selected wallpaper")
 		output, err := wh.SetSelectedWallpaper(selection, app)
 		if err != nil {
 			return "", fmt.Errorf("%w", err)

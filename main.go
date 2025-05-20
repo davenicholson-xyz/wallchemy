@@ -7,11 +7,17 @@ import (
 	"github.com/davenicholson-xyz/wallchemy/application"
 	"github.com/davenicholson-xyz/wallchemy/config"
 	"github.com/davenicholson-xyz/wallchemy/logger"
+	"github.com/sirupsen/logrus"
 )
 
 var version = "version"
 
 func main() {
+
+	_, exists := os.LookupEnv("WALLCHEMY_DEBUG")
+	if exists {
+		logger.Log.SetLevel(logrus.DebugLevel)
+	}
 
 	logger.Log.Info("Wallchemy starting...")
 
