@@ -11,6 +11,8 @@ import (
 	"syscall"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
+	"github.com/davenicholson-xyz/wallchemy/logger"
+	"github.com/sirupsen/logrus"
 )
 
 func enableCors(w *http.ResponseWriter) {
@@ -21,12 +23,15 @@ func enableCors(w *http.ResponseWriter) {
 
 func StartDaemon(app *appcontext.AppContext) {
 
+	os.Unsetenv("WALLCHEMY_STARTDAEMON")
+
 	go func() {
 		pid := os.Getpid()
 		err := app.CacheTools.WriteStringToFile("daemon.pid", strconv.Itoa(pid))
 		if err != nil {
 			log.Fatalf("Failed to write PID file: %v", err)
 		}
+		logger.Log.WithField("PID", pid).Info("Started daemon")
 		log.Printf("Daemon PID: %d\n", pid)
 
 		defer func() {
@@ -41,22 +46,32 @@ func StartDaemon(app *appcontext.AppContext) {
 		})
 
 		mux.HandleFunc("GET /wp/{id}", func(w http.ResponseWriter, r *http.Request) {
+			logger.Log.WithField("PATH", os.Getenv("PATH")).Info("Daemon environment PATH")
 			enableCors(&w)
 
 			id := r.PathValue("id")
 
-			cmd := exec.Command("wallchemy", "-id", id)
+			logger.Log.WithField("id", id).Debug("Daeomon request for wallpaper change")
 
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			cmd.Env = os.Environ()
+			exePath, err := exec.LookPath("wallchemy")
+			if err != nil {
+				logger.Log.WithError(err).Error("wallchemy not found in PATH")
+				http.Error(w, `{"error":"wallchemy not found in PATH"}`, http.StatusInternalServerError)
+				return
+			}
+			logger.Log.WithField("path", exePath).Info("Found wallchemy executable")
 
-			if err := cmd.Start(); err != nil {
+			output, err := exec.Command(exePath, "-id", id).CombinedOutput()
+			if err != nil {
+				logger.Log.WithFields(logrus.Fields{
+					"error":  err,
+					"output": string(output),
+				}).Error("Failed to execute wallchemy command")
 				http.Error(w, fmt.Sprintf("{\"error\":\"%v\"}", err), http.StatusInternalServerError)
 				return
 			}
 
-			fmt.Fprintf(w, "{\"status\":\"success\", \"id\":\"%s\", \"pid\":%d}", id, cmd.Process.Pid)
+			logger.Log.WithField("output", string(output)).Debug("Successfully changed wallpaper")
 
 		})
 
@@ -69,6 +84,7 @@ func StartDaemon(app *appcontext.AppContext) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
+	logger.Log.Info("Daemon shutting down")
 	log.Println("Daemon shutting down")
 
 }
