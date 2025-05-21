@@ -23,9 +23,9 @@ const (
 func LaunchDaemon(app *appcontext.AppContext) error {
 	execPath, err := os.Executable()
 	if err != nil {
-		logger.Log.WithField("execPath", execPath).Debug("Found executable path")
 		return fmt.Errorf("could not determine executable path: %w", err)
 	}
+	logger.Log.WithField("execPath", execPath).Debug("Found executable path")
 
 	var daemonPort = "2388"
 
@@ -37,13 +37,14 @@ func LaunchDaemon(app *appcontext.AppContext) error {
 		cachePort, err := app.CacheTools.ReadLineFromFile("wallhaven/daemon_port", 1)
 		if err != nil {
 			daemonPort = "2388"
+			app.CacheTools.WriteStringToFile("wallhaven/daemon_port", "2388")
 		}
 		if cachePort != "" {
 			daemonPort = cachePort
 		}
 	}
 
-	cmd := exec.Command(execPath, "-port", daemonPort)
+	cmd := exec.Command(execPath, "-startdaemon", "-port", daemonPort)
 
 	nullFile, err := os.OpenFile(os.DevNull, os.O_RDWR, 0)
 	if err != nil {
