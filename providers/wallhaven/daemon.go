@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"strconv"
 	"syscall"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
@@ -24,19 +23,9 @@ func enableCors(w *http.ResponseWriter) {
 func StartDaemon(app *appcontext.AppContext) {
 
 	go func() {
-		pid := os.Getpid()
 		port := app.Config.GetIntWithDefault("port", 2388)
 
-		err := app.CacheTools.WriteStringToFile("daemon.pid", strconv.Itoa(pid))
-		if err != nil {
-			log.Fatalf("Failed to write PID file: %v", err)
-		}
-		logger.Log.WithField("PID", pid).WithField("port", port).Info("Started daemon")
-		log.Printf("Daemon PID: %d\n", pid)
-
-		defer func() {
-			app.CacheTools.DeleteFile("daemon.pid")
-		}()
+		logger.Log.WithField("port", port).Info("Started daemon")
 
 		mux := http.NewServeMux()
 
@@ -59,7 +48,7 @@ func StartDaemon(app *appcontext.AppContext) {
 				http.Error(w, `{"error":"wallchemy not found in PATH"}`, http.StatusInternalServerError)
 				return
 			}
-			logger.Log.WithField("path", exePath).Info("Found wallchemy executable")
+			logger.Log.WithField("path", exePath).Debug("Found wallchemy executable")
 
 			output, err := exec.Command(exePath, "-id", id).CombinedOutput()
 			if err != nil {
@@ -73,6 +62,11 @@ func StartDaemon(app *appcontext.AppContext) {
 
 			logger.Log.WithField("output", string(output)).Debug("Successfully changed wallpaper")
 
+		})
+
+		mux.HandleFunc("GET /kill", func(w http.ResponseWriter, r *http.Request) {
+			logger.Log.Info("Killing daemon")
+			os.Exit(0)
 		})
 
 		portStr := fmt.Sprintf(":%d", port)

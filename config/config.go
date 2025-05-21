@@ -2,11 +2,11 @@ package config
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/davenicholson-xyz/wallchemy/logger"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,7 +23,7 @@ func New(path string) (*Config, error) {
 }
 
 func load(filepath string) (*Config, error) {
-	slog.Debug("Loading config: " + filepath)
+	logger.Log.WithField("file", filepath).Debug("Loading config file")
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 

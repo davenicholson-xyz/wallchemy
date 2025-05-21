@@ -5,10 +5,10 @@ package wallhaven
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"syscall"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
@@ -23,9 +23,23 @@ func LaunchDaemon(app *appcontext.AppContext) error {
 		return fmt.Errorf("could not determine executable path: %w", err)
 	}
 
-	port := app.Config.GetIntWithDefault("port", 2388)
+	var daemonPort = "2388"
 
-	cmd := exec.Command(execPath, "-startdaemon", "-port", strconv.Itoa(port))
+	configPort := app.Config.GetInt("port")
+	if configPort > 0 {
+		app.CacheTools.WriteStringToFile("wallhaven/daemon_port", strconv.Itoa(configPort))
+		daemonPort = strconv.Itoa(configPort)
+	} else {
+		cachePort, err := app.CacheTools.ReadLineFromFile("wallhaven/daemon_port", 1)
+		if err != nil {
+			daemonPort = "2388"
+		}
+		if cachePort != "" {
+			daemonPort = cachePort
+		}
+	}
+
+	cmd := exec.Command(execPath, "-startdaemon", "-port", daemonPort)
 	nullFile, err := os.OpenFile(os.DevNull, os.O_RDWR, 0)
 	if err != nil {
 		return fmt.Errorf("failed to open null device: %w", err)
@@ -44,8 +58,6 @@ func LaunchDaemon(app *appcontext.AppContext) error {
 		return fmt.Errorf("failed to start daemon: %w", err)
 	}
 
-	fmt.Printf("Daemon started with PID %d\n", cmd.Process.Pid)
-
 	os.Exit(0)
 
 	return nil
@@ -53,30 +65,19 @@ func LaunchDaemon(app *appcontext.AppContext) error {
 }
 
 func KillDaemon(app *appcontext.AppContext) error {
-	data, err := app.CacheTools.ReadLineFromFile("daemon.pid", 1)
+
+	var port string
+	port, err := app.CacheTools.ReadLineFromFile("wallhaven/daemon_port", 1)
 	if err != nil {
-		logger.Log.Debug("No daemon PID found")
-		return nil
+		return fmt.Errorf("%w", err)
 	}
 
-	pid, err := strconv.Atoi(strings.TrimSpace(string(data)))
+	killStr := fmt.Sprintf("http://localhost:%s/kill", port)
+
+	_, err = http.Get(killStr)
 	if err != nil {
-		logger.Log.WithField("PID", pid).Debug("Invalid PID found")
-		return nil
+		logger.Log.Debug("Could not kill daemon with GET request")
 	}
-
-	process, err := os.FindProcess(pid)
-	if err != nil {
-		logger.Log.WithField("PID", pid).Debug("Unable to find process with PID")
-		return nil
-	}
-
-	if err := process.Kill(); err != nil {
-		logger.Log.WithError(err).Debug("Could not kill process")
-		return nil
-	}
-
-	app.CacheTools.DeleteFile("daemon.pid")
 
 	logger.Log.Info("Daemon process stopped")
 

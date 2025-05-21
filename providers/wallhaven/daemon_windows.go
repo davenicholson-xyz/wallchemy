@@ -5,6 +5,7 @@ package wallhaven
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
@@ -20,15 +21,30 @@ const (
 	CREATE_NO_WINDOW         = 0x08000000
 )
 
-func LaunchDaemon() error {
+func LaunchDaemon(app *appcontext.AppContext) error {
 	execPath, err := os.Executable()
 	if err != nil {
 		logger.Log.WithField("execPath", execPath).Debug("Found executable path")
 		return fmt.Errorf("could not determine executable path: %w", err)
 	}
 
-	cmd := exec.Command(execPath)
-	cmd.Env = append(os.Environ(), "WALLCHEMY_STARTDAEMON=1")
+	var daemonPort = "2388"
+
+	configPort := app.Config.GetInt("port")
+	if configPort > 0 {
+		app.CacheTools.WriteStringToFile("wallhaven/daemon_port", strconv.Itoa(configPort))
+		daemonPort = strconv.Itoa(configPort)
+	} else {
+		cachePort, err := app.CacheTools.ReadLineFromFile("wallhaven/daemon_port", 1)
+		if err != nil {
+			daemonPort = "2388"
+		}
+		if cachePort != "" {
+			daemonPort = cachePort
+		}
+	}
+
+	cmd := exec.Command(execPath, "-port", daemonPort)
 
 	nullFile, err := os.OpenFile(os.DevNull, os.O_RDWR, 0)
 	if err != nil {
@@ -46,25 +62,19 @@ func LaunchDaemon() error {
 }
 
 func KillDaemon(app *appcontext.AppContext) error {
-	data, err := app.CacheTools.ReadLineFromFile("daemon.pid", 1)
+
+	var port string
+	port, err := app.CacheTools.ReadLineFromFile("wallhaven/daemon_port", 1)
 	if err != nil {
-		logger.Log.Debug("No daemon PID found")
-		return nil
+		return fmt.Errorf("%w", err)
 	}
 
-	pid, err := strconv.Atoi(strings.TrimSpace(string(data)))
+	killStr := fmt.Sprintf("http://localhost:%s/kill", port)
+
+	_, err = http.Get(killStr)
 	if err != nil {
-		logger.Log.WithField("PID", pid).Debug("Invalid PID found")
-		return nil
+		logger.Log.Debug("Could not kill daemon with GET request")
 	}
-
-	cmd := exec.Command("taskkill", "/F", "/PID", strconv.Itoa(pid))
-	if err := cmd.Run(); err != nil {
-		logger.Log.WithError(err).Debug("Could not kill process")
-		return nil
-	}
-
-	app.CacheTools.DeleteFile("daemon.pid")
 
 	logger.Log.Info("Daemon process stopped")
 
