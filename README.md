@@ -123,6 +123,9 @@ Deletes cache files
 #### `-daemon`
 Start the wallchemy background daemon (for use with the Chrome extension)
 
+#### `-port`
+Port for the wallchemy daemon to listen on. Defaults to 8233
+
 #### `-kill`
 Kill the wallchemy background daemon
 
