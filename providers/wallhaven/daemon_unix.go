@@ -33,6 +33,7 @@ func LaunchDaemon(app *appcontext.AppContext) error {
 		cachePort, err := app.CacheTools.ReadLineFromFile("wallhaven/daemon_port", 1)
 		if err != nil {
 			daemonPort = "2388"
+			app.CacheTools.WriteStringToFile("wallhaven/daemon_port", strconv.Itoa(configPort))
 		}
 		if cachePort != "" {
 			daemonPort = cachePort
