@@ -4,3 +4,7 @@ wallchemy
 .DS_Store
 wallchemy.pid
 wallchemy.log
+.direnv
+flake.nix
+flake.lock
+.envrc
