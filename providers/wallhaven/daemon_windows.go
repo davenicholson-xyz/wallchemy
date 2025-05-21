@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"syscall"
 
 	"github.com/davenicholson-xyz/wallchemy/appcontext"
