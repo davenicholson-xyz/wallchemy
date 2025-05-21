@@ -108,6 +108,9 @@ Stops output of the chosen wallpaper file path after querying
 #### `-stealth`
 Wallpaper will be downloaded but will not change the wallpaper
 
+#### `-last`
+Returns the last random query
+
 #### `-file`
 Returns the current file path of the last wallpaper set with wallhwaven
 
