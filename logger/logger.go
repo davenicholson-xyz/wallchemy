@@ -32,7 +32,7 @@ func getLogPath(appName string) string {
 	switch runtime.GOOS {
 	case "linux":
 		home, _ := os.UserHomeDir()
-		logDir = filepath.Join(home, "local", "share", appName, "logs")
+		logDir = filepath.Join(home, ".local", "share", appName, "logs")
 	case "darwin":
 		home, _ := os.UserHomeDir()
 		logDir = filepath.Join(home, "Library", "Logs", appName)
