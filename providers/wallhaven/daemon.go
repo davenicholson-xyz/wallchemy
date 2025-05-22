@@ -34,6 +34,11 @@ func StartDaemon(app *appcontext.AppContext) {
 			fmt.Fprintf(w, "{\"ping\":\"pong\"}")
 		})
 
+		mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+			enableCors(&w)
+			fmt.Fprintf(w, "{\"ping\":\"pong\"}")
+		})
+
 		mux.HandleFunc("GET /wp/{id}", func(w http.ResponseWriter, r *http.Request) {
 			logger.Log.WithField("PATH", os.Getenv("PATH")).Info("Daemon environment PATH")
 			enableCors(&w)
