@@ -57,6 +57,7 @@ apikey: your_secret_wallhaven_apikey
 noanime: true
 nsfw: false
 expiry: 600
+#script: "swww img"
 ```
 
 ---
