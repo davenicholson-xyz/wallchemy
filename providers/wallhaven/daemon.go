@@ -1,6 +1,7 @@
 package wallhaven
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -25,18 +26,23 @@ func StartDaemon(app *appcontext.AppContext) {
 	go func() {
 		port := app.Config.GetIntWithDefault("port", 2388)
 
+		hasAPIkey := "false"
+		apikey := app.Config.GetString("apikey")
+		if apikey != "" {
+			hasAPIkey = "true"
+		}
+
 		logger.Log.WithField("port", port).Info("Started daemon")
 
 		mux := http.NewServeMux()
 
-		mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-			enableCors(&w)
-			fmt.Fprintf(w, "{\"ping\":\"pong\"}")
-		})
-
 		mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 			enableCors(&w)
-			fmt.Fprintf(w, "{\"ping\":\"pong\"}")
+			msg := map[string]string{"apikey": string(hasAPIkey)}
+			jsonMsg, _ := json.Marshal(msg)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write(jsonMsg)
 		})
 
 		mux.HandleFunc("GET /wp/{id}", func(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +51,7 @@ func StartDaemon(app *appcontext.AppContext) {
 
 			id := r.PathValue("id")
 
-			logger.Log.WithField("id", id).Debug("Daeomon request for wallpaper change")
+			logger.Log.WithField("id", id).Debug("Daemon request for wallpaper change")
 
 			exePath, err := exec.LookPath("wallchemy")
 			if err != nil {
@@ -61,7 +67,11 @@ func StartDaemon(app *appcontext.AppContext) {
 					"error":  err,
 					"output": string(output),
 				}).Error("Failed to execute wallchemy command")
-				http.Error(w, fmt.Sprintf("{\"error\":\"%v\"}", err), http.StatusInternalServerError)
+
+				errMsg := map[string]string{"error": string(output)}
+				jsonErr, _ := json.Marshal(errMsg)
+				http.Error(w, string(jsonErr), http.StatusInternalServerError)
+
 				return
 			}
 
