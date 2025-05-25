@@ -50,6 +50,15 @@ irm https://raw.githubusercontent.com/davenicholson-xyz/wallchemy/main/install.p
 
 Configuration is stored in `$HOME/.config/wallchemy/config.yml` on linux/mac or `%appdata%/Roaming/wallchemy/config.yml` on Windows. Wallchemy's defaults will be overwritten by these options, which in turn will be overwritten by any environment variables set proceeded with `WALLCHEMY_`. These can then be overridden with any command line flags.
 
+#### Sample `config.yml`
+```sh
+username: wallhaven_username
+apikey: your_secret_wallhaven_apikey
+noanime: true
+nsfw: false
+expiry: 600
+```
+
 ---
 
 ### Usage
