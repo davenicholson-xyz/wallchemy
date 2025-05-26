@@ -103,6 +103,9 @@ Return sketchy results from random, hot and top searches
 #### `-nsfw`
 Return sketchy results from random, hot and top searches (API key required)
 
+#### `-extras "key=value"`
+Any extra custom url parameters to add to the search. e.g. `-extras "ratios=landscape&order=asc"`
+
 #### `-id [wallhaven id]`
 Sets wallpaper using the wallhaven.cc wallpaper ID
 
