@@ -41,10 +41,25 @@ func (ct *CacheTools) Join(path ...string) string {
 }
 
 func (ct *CacheTools) Clear() error {
-	err := os.RemoveAll(ct.GetCacheDirectory())
+	cacheDir := ct.GetCacheDirectory()
+
+	entries, err := os.ReadDir(cacheDir)
 	if err != nil {
 		return err
 	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		dirPath := filepath.Join(cacheDir, entry.Name())
+		err := os.RemoveAll(dirPath)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

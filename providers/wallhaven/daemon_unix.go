@@ -27,13 +27,13 @@ func LaunchDaemon(app *appcontext.AppContext) error {
 
 	configPort := app.Config.GetInt("port")
 	if configPort > 0 {
-		app.CacheTools.WriteStringToFile("wallhaven/daemon_port", strconv.Itoa(configPort))
+		app.CacheTools.WriteStringToFile("wallhaven.port", strconv.Itoa(configPort))
 		daemonPort = strconv.Itoa(configPort)
 	} else {
-		cachePort, err := app.CacheTools.ReadLineFromFile("wallhaven/daemon_port", 1)
+		cachePort, err := app.CacheTools.ReadLineFromFile("wallhaven.port", 1)
 		if err != nil {
 			daemonPort = "2388"
-			app.CacheTools.WriteStringToFile("wallhaven/daemon_port", "2388")
+			app.CacheTools.WriteStringToFile("wallhaven.port", "2388")
 		}
 		if cachePort != "" {
 			daemonPort = cachePort
@@ -68,7 +68,7 @@ func LaunchDaemon(app *appcontext.AppContext) error {
 func KillDaemon(app *appcontext.AppContext) error {
 
 	var port string
-	port, err := app.CacheTools.ReadLineFromFile("wallhaven/daemon_port", 1)
+	port, err := app.CacheTools.ReadLineFromFile("wallhaven.port", 1)
 	if err != nil {
 		return fmt.Errorf("%w", err)
 	}
