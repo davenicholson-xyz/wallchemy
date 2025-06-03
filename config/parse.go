@@ -8,7 +8,6 @@ func ParseFlags() map[string]any {
 	flg.DefineString("provider", "wallhaven", "Wallpaper provider [wallhaven]")
 
 	flg.DefineBool("daemon", false, "Start the background daemon")
-	flg.DefineBoolHidden("startdaemon", false)
 	flg.DefineBool("kill", false, "Kill the background daemon")
 	flg.DefineInt("port", 0, "Port to launch daemon listener on")
 
@@ -38,6 +37,9 @@ func ParseFlags() map[string]any {
 	flg.DefineBool("clear", false, "Clear the wallchemy cache")
 
 	flg.DefineBool("version", false, "Version info")
+
+	flg.DefineBoolHidden("startdaemon", false)
+	flg.DefineBoolHidden("fromsync", false)
 
 	flgValues := flg.Collect()
 

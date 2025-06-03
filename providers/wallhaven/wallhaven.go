@@ -11,6 +11,7 @@ import (
 	"github.com/davenicholson-xyz/wallchemy/download"
 	"github.com/davenicholson-xyz/wallchemy/files"
 	"github.com/davenicholson-xyz/wallchemy/logger"
+	"github.com/davenicholson-xyz/wallchemy/network"
 )
 
 type WallpaperData struct {
@@ -51,6 +52,16 @@ func SetSelectedWallpaper(selected string, app *appcontext.AppContext) (string, 
 
 	currentID := parseIdFromPath(selected)
 	wallhaven_url := fmt.Sprintf("https://wallhaven.cc/w/%s", currentID)
+
+	//TODO: send Id to /tmp/wallchemy.sock if it exists (for wallchemy-sync) only if fromsync flag has been set
+
+	fromSync := app.Config.GetBool("fromsync")
+	if !fromSync {
+		_, err := network.SendIPCMessage(currentID)
+		if err != nil {
+
+		}
+	}
 
 	current_string := fmt.Sprintf("%s\n%s\n%s\n%s", currentID, wallhaven_url, selected, output)
 
