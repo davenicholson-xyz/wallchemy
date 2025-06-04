@@ -53,13 +53,10 @@ func SetSelectedWallpaper(selected string, app *appcontext.AppContext) (string, 
 	currentID := parseIdFromPath(selected)
 	wallhaven_url := fmt.Sprintf("https://wallhaven.cc/w/%s", currentID)
 
-	//TODO: send Id to /tmp/wallchemy.sock if it exists (for wallchemy-sync) only if fromsync flag has been set
-
 	fromSync := app.Config.GetBool("fromsync")
 	if !fromSync {
 		_, err := network.SendIPCMessage(currentID)
 		if err != nil {
-
 		}
 	}
 

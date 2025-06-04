@@ -28,7 +28,7 @@ func SendIPCMessage(message string) (string, error) {
 		return "", fmt.Errorf("set write deadline failed: %w", err)
 	}
 
-	_, err = conn.Write([]byte(message + "\n")) // Add newline as message delimiter
+	_, err = conn.Write([]byte(message + "\n"))
 	if err != nil {
 		return "", fmt.Errorf("write failed: %w", err)
 	}
