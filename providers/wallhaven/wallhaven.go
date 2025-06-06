@@ -57,7 +57,9 @@ func SetSelectedWallpaper(selected string, app *appcontext.AppContext) (string, 
 	if !fromSync {
 		_, err := network.SendIPCMessage(currentID)
 		if err != nil {
+			fmt.Println(err)
 		}
+
 	}
 
 	current_string := fmt.Sprintf("%s\n%s\n%s\n%s", currentID, wallhaven_url, selected, output)

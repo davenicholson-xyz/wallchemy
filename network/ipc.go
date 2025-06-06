@@ -5,38 +5,46 @@ import (
 	"net"
 	"runtime"
 	"time"
+
+	"github.com/Microsoft/go-winio" // Add this import
 )
 
 func SendIPCMessage(message string) (string, error) {
-	var network, address string
+	var conn net.Conn
+	var err error
+	timeout := 2 * time.Second
 
 	if runtime.GOOS == "windows" {
-		network = "pipe"
-		address = `\\.\pipe\wallchemy`
+		// Use winio for Windows named pipes
+		address := `\\.\pipe\wallchemy`
+		conn, err = winio.DialPipe(address, &timeout)
 	} else {
-		network = "unix"
-		address = "/tmp/wallchemy.sock"
+		// Unix domain socket
+		address := "/tmp/wallchemy.sock"
+		conn, err = net.DialTimeout("unix", address, timeout)
 	}
 
-	conn, err := net.DialTimeout(network, address, 2*time.Second)
 	if err != nil {
 		return "", fmt.Errorf("connection failed: %w", err)
 	}
 	defer conn.Close()
 
-	if err := conn.SetWriteDeadline(time.Now().Add(2 * time.Second)); err != nil {
+	// Set write deadline
+	if err := conn.SetWriteDeadline(time.Now().Add(timeout)); err != nil {
 		return "", fmt.Errorf("set write deadline failed: %w", err)
 	}
 
-	_, err = conn.Write([]byte(message + "\n"))
-	if err != nil {
+	// Send message with newline terminator
+	if _, err := conn.Write([]byte(message + "\n")); err != nil {
 		return "", fmt.Errorf("write failed: %w", err)
 	}
 
-	if err := conn.SetReadDeadline(time.Now().Add(2 * time.Second)); err != nil {
+	// Set read deadline
+	if err := conn.SetReadDeadline(time.Now().Add(timeout)); err != nil {
 		return "", fmt.Errorf("set read deadline failed: %w", err)
 	}
 
+	// Read response
 	buf := make([]byte, 1024)
 	n, err := conn.Read(buf)
 	if err != nil {
