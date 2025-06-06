@@ -3,10 +3,7 @@ package network
 import (
 	"fmt"
 	"net"
-	"runtime"
 	"time"
-
-	"github.com/Microsoft/go-winio" // Add this import
 )
 
 func SendIPCMessage(message string) (string, error) {
@@ -14,16 +11,7 @@ func SendIPCMessage(message string) (string, error) {
 	var err error
 	timeout := 2 * time.Second
 
-	if runtime.GOOS == "windows" {
-		// Use winio for Windows named pipes
-		address := `\\.\pipe\wallchemy`
-		conn, err = winio.DialPipe(address, &timeout)
-	} else {
-		// Unix domain socket
-		address := "/tmp/wallchemy.sock"
-		conn, err = net.DialTimeout("unix", address, timeout)
-	}
-
+	conn, err = dialIPC(timeout)
 	if err != nil {
 		return "", fmt.Errorf("connection failed: %w", err)
 	}
