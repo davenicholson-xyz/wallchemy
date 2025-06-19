@@ -4,39 +4,84 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/davenicholson-xyz/wallchemy/application"
-	"github.com/davenicholson-xyz/wallchemy/config"
-	"github.com/davenicholson-xyz/wallchemy/logger"
-	"github.com/sirupsen/logrus"
+	wapi "github.com/davenicholson-xyz/go-wallhaven/wallhavenapi"
+	"github.com/davenicholson-xyz/wallchemy/app"
+	"github.com/davenicholson-xyz/wallchemy/handlers"
 )
 
 var version = "version"
 
 func main() {
 
-	_, exists := os.LookupEnv("WALLCHEMY_DEBUG")
-	if exists {
-		logger.Log.SetLevel(logrus.DebugLevel)
+	appCtx := app.NewAppContext(version)
+
+	logConfig := app.LoggerConfigFromEnv()
+	if err := app.InitLogger(logConfig); err != nil {
+		panic("Failed to initialize logging")
 	}
 
-	logger.Log.Info("Wallchemy starting...")
+	app.Logger.Info("Wallchemy started")
 
-	flgValues := config.ParseFlags()
+	config, err := app.LoadConfig()
+	if err != nil {
+		app.Logger.WithError(err).Error("Unable to load config")
+	}
 
-	_, version_ok := flgValues["version"]
-	if version_ok {
+	appCtx.AddConfig(config)
+
+	if config.Version {
+		app.Logger.WithField("version", version).Info("Version check")
 		fmt.Println(version)
 		os.Exit(0)
 	}
 
-	result, err := application.RunApp(flgValues)
+	if config.Help {
+		app.Logger.Info("Help requested")
+		app.ShowHelp()
+		os.Exit(0)
+	}
+
+	cache, err := app.NewCacheTools("wallchemy")
 	if err != nil {
-		fmt.Printf("%s\n", err)
+		panic("Failed to parse cache folder")
+	}
+	app.Logger.WithField("folder", cache.GetCacheDirectory()).Info("Cache folder initialized")
+
+	if err := runApp(appCtx); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	if result != "" {
-		fmt.Println(result)
+}
+
+func runApp(appCtx *app.AppContext) error {
+
+	var result string
+
+	appCtx.AddWallhavenAPI(wapi.New())
+
+	cache, err := app.NewCacheTools("wallchemy")
+	if err != nil {
+		return fmt.Errorf("Cache error: %w", err)
+	}
+	appCtx.AddCacheTools(cache)
+
+	if appCtx.Config.APIKey != "" {
+		appCtx.WallhavenAPI.APIKey(appCtx.Config.APIKey)
 	}
 
+	result, err = handlers.ExecuteCommand(appCtx)
+	if err != nil {
+		return err
+	}
+
+	if appCtx.Config.Silent {
+		app.Logger.WithField("output", result).Debug("Silencing output")
+	} else {
+		if result != "" {
+			fmt.Println(result)
+		}
+	}
+
+	return nil
 }
