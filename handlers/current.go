@@ -8,7 +8,7 @@ import (
 	"github.com/davenicholson-xyz/wallchemy/app"
 )
 
-func handleCurrent(appCtx *app.AppContext) (string, error) {
+func handleInfo(appCtx *app.AppContext) (string, error) {
 
 	if appCtx.CacheTools.FileExists("current") {
 

@@ -38,7 +38,7 @@ type Config struct {
 	Silent        bool     `mapstructure:"silent"`
 	Stealth       bool     `mapstructure:"stealth"`
 	Clean         bool     `mapstructure:"clean"`
-	Current       bool     `mapstructure:"current"`
+	Info          bool     `mapstructure:"info"`
 	Daemon        string   `mapstructure:"daemon"`
 	LaunchDaemon  bool     `mapstructure:"launchdaemon"`
 	Port          int      `mapstructure:"port"`
@@ -80,7 +80,7 @@ func setupFlags() {
 	pflag.Bool("stealth", false, "Download wallpaper but don't actually set it (useful for testing)")
 
 	pflag.Bool("clean", false, "Clean the cache directory (removes all cached wallpapers and search results)")
-	pflag.Bool("current", false, "Show information about the currently set wallpaper")
+	pflag.Bool("info", false, "Show information about the currently set wallpaper")
 
 	pflag.String("daemon", "", "Start the background daemon for browser extension support")
 	pflag.Bool("launchdaemon", false, "")
@@ -170,7 +170,7 @@ EXECUTION:
   --pages <num>                 Max pages to fetch (default: 5)
 
 UTILITIES:
-  --current                     Show current wallpaper info
+  --info                        Show current wallpaper info
   --clean                       Clean cache directory
   --version                     Show version
   --help                        Show this help

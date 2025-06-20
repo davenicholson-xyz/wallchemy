@@ -15,7 +15,7 @@ const (
 	Collection      WallchemyCommand = "collection"
 	CollectionList  WallchemyCommand = "collections"
 	Random          WallchemyCommand = "random"
-	Current         WallchemyCommand = "current"
+	Info            WallchemyCommand = "info"
 	Clean           WallchemyCommand = "clean"
 	Daemon          WallchemyCommand = "daemon"
 	LaunchDaemonCmd WallchemyCommand = "launchdaemon"
@@ -125,8 +125,8 @@ func parseAction(appCtx *app.AppContext) WallchemyCommand {
 		return Random
 	}
 
-	if appCtx.Config.Current {
-		return Current
+	if appCtx.Config.Info {
+		return Info
 	}
 
 	if appCtx.Config.Clean {
@@ -161,8 +161,8 @@ func ExecuteCommand(appCtx *app.AppContext) (string, error) {
 		return handleRandom(appCtx)
 	case Clean:
 		return handleClean(appCtx)
-	case Current:
-		return handleCurrent(appCtx)
+	case Info:
+		return handleInfo(appCtx)
 	case LaunchDaemonCmd:
 		return startDaemon(appCtx)
 	case Daemon:
