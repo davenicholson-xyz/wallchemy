@@ -58,7 +58,7 @@ username: "yourusername"
 categories: ["general", "anime"]
 purity: ["sfw", "sketchy"]
 expiry: 1200
-pages: 10`
+pages: 10
 ```
 
 ## Quick Start
