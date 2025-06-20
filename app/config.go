@@ -75,7 +75,7 @@ func setupFlags() {
 	pflag.Int("pages", 5, "Maximum number of pages to fetch from API (24 wallpapers per page)")
 
 	pflag.String("script", "", "Custom script to set wallpaper instead of built-in method (receives file path as argument)")
-	pflag.String("output", "", "Output")
+	pflag.String("output", "", "Output folder for wallpaper downloads")
 	pflag.Bool("silent", false, "Suppress all output except errors")
 	pflag.Bool("stealth", false, "Download wallpaper but don't actually set it (useful for testing)")
 
