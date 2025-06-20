@@ -140,6 +140,10 @@ func handleCollection(appCtx *app.AppContext) (string, error) {
 		return "", err
 	}
 
+	appCtx.Current.Path = selectedWallpaper
+	appCtx.Current.FilePath = downloadResult.FilePath
+	SaveCurrent(appCtx)
+
 	return downloadResult.FilePath, nil
 
 }

@@ -50,7 +50,7 @@ func SaveCurrent(appCtx *app.AppContext) error {
 		return err
 	}
 
-	app.Logger.Debug("Saved current file info")
+	app.Logger.WithField("file", appCtx.CacheTools.GetCacheDirectory()+"/current").Debug("Saved current file info")
 
 	return nil
 }
