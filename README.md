@@ -128,7 +128,7 @@ wallchemy --apikey "your-api-key" --username "yourusername" --collection "my fav
 
 ### Browser extensions and daemon mode
 
-Wallchemy can set the desktop wallpaper directly from the browser using an extension and the Wallchemy bckground daemon. Start the daemon by running `wallchemy --daemon start`. The extension can be installed from the [Chrome web store](https://chromewebstore.google.com/detail/wallchemy-helper/iegfdnonehdmlnmldgkekhmoiplkokbd) or the [Firefox Add-Ons](https://addons.mozilla.org/en-GB/firefox/addon/wallchemy-helper/)
+Wallchemy can set the desktop wallpaper directly from the browser using an extension and the Wallchemy background daemon. Start the daemon by running `wallchemy --daemon start`. The extension can be installed from the [Chrome web store](https://chromewebstore.google.com/detail/wallchemy-helper/iegfdnonehdmlnmldgkekhmoiplkokbd) or the [Firefox Add-Ons](https://addons.mozilla.org/en-GB/firefox/addon/wallchemy-helper/)
 
 For more info check the [wiki](https://github.com/davenicholson-xyz/wallchemy/wiki/Browser-extensions)
 
