@@ -175,12 +175,17 @@ UTILITIES:
   --version                     Show version
   --help                        Show this help
 
+BROWSER EXTENSION DAEMON:
+  --daemon start                Start the background daemon
+  --daemon status               Check background daemon is running
+  --daemon stop                 Stop the background daemon
+
 EXAMPLES:
   wallchemy --random "nature mountains"
   wallchemy --hot --categories general --purity sfw
   wallchemy --top --range 1w --minresolution 2560x1440
   wallchemy --id ox83dp3
-  wallchemy --collection "My Favorites"
+  wallchemy --collection "my Favorites"
   wallchemy --random "cyberpunk" --colors 00ffff --ratios 21x9
 
 EXAMPLE CONFIG FILE - config.yml:
