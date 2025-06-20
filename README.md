@@ -121,7 +121,7 @@ wallchemy --apikey "your-api-key" --username "yourusername" --collection "my fav
 ### Utilities
 | Flag | Description |
 |------|-------------|
-| `--current` | Show current wallpaper info |
+| `--info` | Show current wallpaper info |
 | `--clean` | Clean cache directory |
 | `--daemon <start\|stop\|status>` | Manage background daemon |
 | `--port <num>` | Daemon port (default: 2388) |
