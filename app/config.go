@@ -49,16 +49,16 @@ func setupFlags() {
 	pflag.BoolP("version", "v", false, "Show version information and exit")
 	pflag.BoolP("help", "h", false, "Show this help message and exit")
 
-	pflag.StringVar(&configFile, "config", "", "Path to custom configuration file (YAML)")
-	pflag.String("apikey", "", "Wallhaven.cc API key for accessing private collections and NSFW content")
-	pflag.String("username", "", "Wallhaven.cc username (required for accessing your collections)")
+	pflag.StringVarP(&configFile, "config", "c", "", "Path to custom configuration file (YAML)")
+	pflag.StringP("apikey", "k", "", "Wallhaven.cc API key for accessing private collections and NSFW content")
+	pflag.StringP("username", "u", "", "Wallhaven.cc username (required for accessing your collections)")
 
-	pflag.String("id", "", "Download and set a specific wallpaper by its Wallhaven ID (e.g., 'ox1234')")
-	pflag.String("collection", "", "Set a random wallpaper from one of your named collections")
+	pflag.StringP("id", "i", "", "Download and set a specific wallpaper by its Wallhaven ID (e.g., 'ox1234')")
+	pflag.StringP("collection", "C", "", "Set a random wallpaper from one of your named collections")
 	pflag.Bool("collections", false, "List all available collections for your account")
-	pflag.String("random", "", "Search term for random wallpapers (e.g., 'nature', 'cars', 'abstract')")
-	pflag.Bool("hot", false, "Select from currently hot/trending wallpapers")
-	pflag.Bool("top", false, "Select from top-rated wallpapers (use --range to specify time period)")
+	pflag.StringP("random", "r", "", "Search term for random wallpapers (e.g., 'nature', 'cars', 'abstract')")
+	pflag.BoolP("hot", "H", false, "Select from currently hot/trending wallpapers")
+	pflag.BoolP("top", "t", false, "Select from top-rated wallpapers (use --range to specify time period)")
 
 	pflag.String("range", "", "Time range for top wallpapers: 1d, 3d, 1w, 1M, 3M, 6M, 1y")
 	pflag.StringSlice("categories", []string{}, "Wallpaper categories to include: general, anime, people")
@@ -71,20 +71,20 @@ func setupFlags() {
 	pflag.String("colors", "", "Dominant color filter as hex code without # (e.g., 'ff0000' for red, '00ff00' for green)")
 	pflag.String("seed", "", "Random seed for consistent results across searches (any string)")
 
-	pflag.Int("expiry", 600, "Cache expiry time in seconds (how long to keep search results cached)")
+	pflag.IntP("expiry", "e", 600, "Cache expiry time in seconds (how long to keep search results cached)")
 	pflag.Int("pages", 5, "Maximum number of pages to fetch from API (24 wallpapers per page)")
 
-	pflag.String("script", "", "Custom script to set wallpaper instead of built-in method (receives file path as argument)")
-	pflag.String("output", "", "Output folder for wallpaper downloads")
-	pflag.Bool("quiet", false, "Suppress all output except errors")
+	pflag.StringP("script", "s", "", "Custom script to set wallpaper instead of built-in method (receives file path as argument)")
+	pflag.StringP("output", "o", "", "Output folder for wallpaper downloads")
+	pflag.BoolP("quiet", "q", false, "Suppress all output except errors")
 	pflag.Bool("stealth", false, "Download wallpaper but don't actually set it (useful for testing)")
 
-	pflag.Bool("clean", false, "Clean the cache directory (removes all cached wallpapers and search results)")
-	pflag.Bool("info", false, "Show information about the currently set wallpaper")
+	pflag.BoolP("clean", "x", false, "Clean the cache directory (removes all cached wallpapers and search results)")
+	pflag.BoolP("info", "I", false, "Show information about the currently set wallpaper")
 
-	pflag.String("daemon", "", "Start the background daemon for browser extension support")
+	pflag.StringP("daemon", "d", "", "Start the background daemon for browser extension support")
 	pflag.Bool("launchdaemon", false, "")
-	pflag.Int("port", 2388, "Port for the backgorund daemon to listen on.")
+	pflag.IntP("port", "p", 2388, "Port for the backgorund daemon to listen on.")
 
 	pflag.CommandLine.MarkHidden("launchdaemon")
 
@@ -139,46 +139,47 @@ USAGE:
 
 WALLPAPER SELECTION MODES:
   Use one of these modes to select wallpapers:
-
-  --id <wallpaper-id>           Download specific wallpaper by ID
-  --random <search-term>        Search for random wallpapers
-  --hot                         Get hot/trending wallpapers  
-  --top                         Get top-rated wallpapers
-  --collection <name>           Random wallpaper from your collection
-  --collections                 List your available collections
+  -i, --id <wallpaper-id>           Download specific wallpaper by ID
+  -r, --random <search-term>        Search for random wallpapers
+  -H, --hot                         Get hot/trending wallpapers  
+  -t, --top                         Get top-rated wallpapers
+  -C, --collection <name>           Random wallpaper from your collection
+      --collections                 List your available collections
 
 FILTERING OPTIONS:
-  --range <period>              Time range for --top: 1d,3d,1w,1M,3M,6M,1y
-  --categories <list>           Categories: general,anime,people
-  --purity <list>               Content: sfw,sketchy,nsfw (nsfw needs API key)
-  --minresolution <res>         Minimum resolution (e.g., 1920x1080)
-  --resolutions <list>          Exact resolutions (e.g., 1920x1080,2560x1440)
-  --ratios <list>               Aspect ratios (e.g., 16x9,16x10,21x9)
-  --colors <hex>                Color filter (hex without #, e.g., ff0000)
-  --seed <string>               Random seed for consistent results
+      --range <period>              Time range for --top: 1d,3d,1w,1M,3M,6M,1y
+      --categories <list>           Categories: general,anime,people
+      --purity <list>               Content: sfw,sketchy,nsfw (nsfw needs API key)
+      --minresolution <res>         Minimum resolution (e.g., 1920x1080)
+      --resolutions <list>          Exact resolutions (e.g., 1920x1080,2560x1440)
+      --ratios <list>               Aspect ratios (e.g., 16x9,16x10,21x9)
+      --colors <hex>                Color filter (hex without #, e.g., ff0000)
+      --seed <string>               Random seed for consistent results
 
 CONFIGURATION:
-  --config <file>               Custom config file path
-  --apikey <key>                Wallhaven.cc API key
-  --username <name>             Wallhaven.cc username
+  -c, --config <file>               Custom config file path
+  -k, --apikey <key>                Wallhaven.cc API key
+  -u, --username <name>             Wallhaven.cc username
 
 EXECUTION:
-  --script <path>               Custom wallpaper-setting script
-  --quiet                       Suppress output
-  --stealth                     Download but don't set wallpaper
-  --expiry <seconds>            Cache expiry (default: 600)
-  --pages <num>                 Max pages to fetch (default: 5)
+  -s, --script <path>               Custom wallpaper-setting script
+  -o, --output <path>               Output folder for wallpaper downloads
+  -q, --quiet                       Suppress output
+      --stealth                     Download but don't set wallpaper
+  -e, --expiry <seconds>            Cache expiry (default: 600)
+      --pages <num>                 Max pages to fetch (default: 5)
 
 UTILITIES:
-  --info                        Show current wallpaper info
-  --clean                       Clean cache directory
-  --version                     Show version
-  --help                        Show this help
+  -I, --info                        Show current wallpaper info
+  -x, --clean                       Clean cache directory
+  -v, --version                     Show version
+  -h, --help                        Show this help
 
 BROWSER EXTENSION DAEMON:
-  --daemon start                Start the background daemon
-  --daemon status               Check background daemon is running
-  --daemon stop                 Stop the background daemon
+  -d, --daemon start                Start the background daemon
+  -d, --daemon status               Check background daemon is running
+  -d, --daemon stop                 Stop the background daemon
+  -p, --port <num>                  Port for daemon to listen on (default: 2388)
 
 EXAMPLES:
   wallchemy --random "nature mountains"
