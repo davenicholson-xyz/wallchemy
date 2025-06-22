@@ -89,11 +89,11 @@ wallchemy --apikey "your-api-key" --username "yourusername" --collection "my fav
 ### Wallpaper Selection Modes
 | Flag | Description | Example |
 |------|-------------|---------|
-| `--id <id>` | Download specific wallpaper | `--id ox83dp3` |
-| `--random <term>` | Search for random wallpapers | `--random "cyberpunk city"` |
-| `--hot` | Get hot/trending wallpapers | `--hot --categories general` |
-| `--top` | Get top-rated wallpapers | `--top --range 1w` |
-| `--collection <name>` | Random from your collection | `--collection "my favourites"` |
+| `-i, --id <id>` | Download specific wallpaper | `--id ox83dp3` |
+| `-r, --random <term>` | Search for random wallpapers | `--random "cyberpunk city"` |
+| `-H, --hot` | Get hot/trending wallpapers | `--hot --categories general` |
+| `-t, --top` | Get top-rated wallpapers | `--top --range 1w` |
+| `-C, --collection <name>` | Random from your collection | `--collection "my favourites"` |
 | `--collections` | List available collections | `--collections` |
 
 ### Filtering Options
@@ -111,20 +111,20 @@ wallchemy --apikey "your-api-key" --username "yourusername" --collection "my fav
 ### Execution Options
 | Flag | Description |
 |------|-------------|
-| `--script <path>` | Custom wallpaper-setting script |
+| `-s, --script <path>` | Custom wallpaper-setting script |
 | `--output <dir>` | Custom output directory |
-| `--quiet` | Suppress output except errors |
+| `-q, --quiet` | Suppress output except errors |
 | `--stealth` | Download but don't set wallpaper |
-| `--expiry <seconds>` | Cache expiry time (default: 600) |
-| `--pages <num>` | Max API pages to fetch (default: 5) |
+| `-e, --expiry <seconds>` | Cache expiry time (default: 600) |
+| `-p, --pages <num>` | Max API pages to fetch (default: 5) |
 
 ### Utilities
 | Flag | Description |
 |------|-------------|
-| `--info` | Show current wallpaper info |
-| `--clean` | Clean cache directory |
-| `--daemon <start\|stop\|status>` | Manage background daemon |
-| `--port <num>` | Daemon port (default: 2388) |
+| `-I, --info` | Show current wallpaper info |
+| `-x,--clean` | Clean cache directory |
+| `-d, --daemon <start\|stop\|status>` | Manage background daemon |
+| `-p, --port <num>` | Daemon port (default: 2388) |
 
 ---
 
