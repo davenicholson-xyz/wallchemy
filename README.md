@@ -113,7 +113,7 @@ wallchemy --apikey "your-api-key" --username "yourusername" --collection "my fav
 |------|-------------|
 | `--script <path>` | Custom wallpaper-setting script |
 | `--output <dir>` | Custom output directory |
-| `--silent` | Suppress output except errors |
+| `--quiet` | Suppress output except errors |
 | `--stealth` | Download but don't set wallpaper |
 | `--expiry <seconds>` | Cache expiry time (default: 600) |
 | `--pages <num>` | Max API pages to fetch (default: 5) |
