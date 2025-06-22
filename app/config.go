@@ -35,7 +35,7 @@ type Config struct {
 	MaxPages      int      `mapstructure:"pages"`
 	Output        string   `mapstructure:"output"`
 	Script        string   `mapstructure:"script"`
-	Silent        bool     `mapstructure:"silent"`
+	Quiet         bool     `mapstructure:"quiet"`
 	Stealth       bool     `mapstructure:"stealth"`
 	Clean         bool     `mapstructure:"clean"`
 	Info          bool     `mapstructure:"info"`
@@ -76,7 +76,7 @@ func setupFlags() {
 
 	pflag.String("script", "", "Custom script to set wallpaper instead of built-in method (receives file path as argument)")
 	pflag.String("output", "", "Output folder for wallpaper downloads")
-	pflag.Bool("silent", false, "Suppress all output except errors")
+	pflag.Bool("quiet", false, "Suppress all output except errors")
 	pflag.Bool("stealth", false, "Download wallpaper but don't actually set it (useful for testing)")
 
 	pflag.Bool("clean", false, "Clean the cache directory (removes all cached wallpapers and search results)")
@@ -164,7 +164,7 @@ CONFIGURATION:
 
 EXECUTION:
   --script <path>               Custom wallpaper-setting script
-  --silent                      Suppress output
+  --quiet                       Suppress output
   --stealth                     Download but don't set wallpaper
   --expiry <seconds>            Cache expiry (default: 600)
   --pages <num>                 Max pages to fetch (default: 5)

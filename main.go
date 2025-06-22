@@ -75,7 +75,7 @@ func runApp(appCtx *app.AppContext) error {
 		return err
 	}
 
-	if appCtx.Config.Silent {
+	if appCtx.Config.Quiet {
 		app.Logger.WithField("output", result).Debug("Silencing output")
 	} else {
 		if result != "" {
