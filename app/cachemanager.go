@@ -8,6 +8,7 @@ import (
 
 	wapi "github.com/davenicholson-xyz/go-wallhaven/wallhavenapi"
 	"github.com/sirupsen/logrus"
+	"slices"
 )
 
 type CacheManager struct {
@@ -130,11 +131,23 @@ func (cm *CacheManager) getRandomWallpaperFromCache(cacheFile string, expirySeco
 		return "", nil
 	}
 
-	selectedWallpaper := validLines[rand.Intn(len(validLines))]
+	availableWallpapers, err := cm.filterBlacklist(validLines)
+	if err != nil {
+		Logger.WithError(err).Warn("Failed to filter blacklisted wallpapers from cache, using all results")
+		availableWallpapers = validLines
+	}
+
+	if len(availableWallpapers) == 0 {
+		Logger.WithField("cache_file", cacheFile).Debug("All cached wallpapers are blacklisted")
+		return "", nil
+	}
+
+	selectedWallpaper := availableWallpapers[rand.Intn(len(availableWallpapers))]
 
 	Logger.WithFields(logrus.Fields{
 		"cache_file":         cacheFile,
 		"total_wallpapers":   len(validLines),
+		"after_blacklist":    len(availableWallpapers),
 		"selected_wallpaper": selectedWallpaper,
 	}).Debug("Selected wallpaper from cache")
 
@@ -221,4 +234,44 @@ func CheckCacheByName(fileName string, appCtx *AppContext) (string, error) {
 	}
 
 	return cachedWallpaper, nil
+}
+
+func (cm *CacheManager) filterBlacklist(wallpapers []string) ([]string, error) {
+	blacklist, err := cm.cacheTools.GetBlacklist()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(blacklist) == 0 {
+		return wallpapers, nil
+	}
+
+	var filtered []string
+	for _, wallpaper := range wallpapers {
+		wallpaperID := cm.extractWallpaperID(wallpaper)
+		isBlacklisted := false
+
+		if slices.Contains(blacklist, wallpaperID) {
+			isBlacklisted = true
+			Logger.WithField("wallpaper_id", wallpaperID).Debug("Filtered out blacklisted wallpaper from cache")
+		}
+
+		if !isBlacklisted {
+			filtered = append(filtered, wallpaper)
+		}
+	}
+
+	return filtered, nil
+}
+
+func (cm *CacheManager) extractWallpaperID(wallpaperPath string) string {
+	parts := strings.Split(wallpaperPath, "/")
+	if len(parts) > 0 {
+		filename := parts[len(parts)-1]
+		if idx := strings.LastIndex(filename, "."); idx != -1 {
+			return filename[:idx]
+		}
+		return filename
+	}
+	return wallpaperPath
 }

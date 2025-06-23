@@ -7,6 +7,7 @@ import (
 
 	wapi "github.com/davenicholson-xyz/go-wallhaven/wallhavenapi"
 	"github.com/sirupsen/logrus"
+	"slices"
 )
 
 type WallpaperFetcher struct {
@@ -62,9 +63,21 @@ func (wf *WallpaperFetcher) FetchAndCacheWallpapers(config FetchConfig) (*FetchR
 	}
 
 	if len(result.Wallpapers) > 0 {
-		result.SelectedRandom = result.Wallpapers[rand.Intn(len(result.Wallpapers))]
+		availableWallpapers, err := wf.filterBlacklisted(result.Wallpapers)
+		if err != nil {
+			Logger.WithError(err).Warn("Failed to filter blacklisted wallpapers, using all results")
+			availableWallpapers = result.Wallpapers
+		}
+
+		if len(availableWallpapers) == 0 {
+			Logger.Warn("All fetched wallpapers are blacklisted")
+			return result, fmt.Errorf("all fetched wallpapers are blacklisted")
+		}
+
+		result.SelectedRandom = availableWallpapers[rand.Intn(len(availableWallpapers))]
 		Logger.WithFields(logrus.Fields{
 			"total_available":    len(result.Wallpapers),
+			"after_blacklist":    len(availableWallpapers),
 			"selected_wallpaper": result.SelectedRandom,
 		}).Info("Selected random wallpaper from fetched results")
 	}
@@ -190,6 +203,46 @@ func (wf *WallpaperFetcher) fetchConcurrently(config FetchConfig) (*FetchResult,
 		SuccessfulPages: successfulPages,
 		RequestedPages:  pagesToFetch,
 	}, nil
+}
+
+func (wf *WallpaperFetcher) filterBlacklisted(wallpapers []string) ([]string, error) {
+	blacklist, err := wf.cacheTools.GetBlacklist()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(blacklist) == 0 {
+		return wallpapers, nil
+	}
+
+	var filtered []string
+	for _, wallpaper := range wallpapers {
+		wallpaperID := wf.extractWallpaperID(wallpaper)
+		isBlacklisted := false
+
+		if slices.Contains(blacklist, wallpaperID) {
+			isBlacklisted = true
+			Logger.WithField("wallpaper_id", wallpaperID).Debug("Filtered out blacklisted wallpaper")
+		}
+
+		if !isBlacklisted {
+			filtered = append(filtered, wallpaper)
+		}
+	}
+
+	return filtered, nil
+}
+
+func (wf *WallpaperFetcher) extractWallpaperID(wallpaperPath string) string {
+	parts := strings.Split(wallpaperPath, "/")
+	if len(parts) > 0 {
+		filename := parts[len(parts)-1]
+		if idx := strings.LastIndex(filename, "."); idx != -1 {
+			return filename[:idx]
+		}
+		return filename
+	}
+	return wallpaperPath
 }
 
 func (wf *WallpaperFetcher) saveToCache(cacheFile string, wallpapers []string) error {

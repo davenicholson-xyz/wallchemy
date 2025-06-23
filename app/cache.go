@@ -388,6 +388,73 @@ func (ct *CacheTools) RemoveSubdir(dirname string) error {
 	return os.RemoveAll(fullPath)
 }
 
+func (ct *CacheTools) AddToBlacklist(wallpaperID string) error {
+	blacklistFile := "blacklist.txt"
+	
+	if ct.FileExists(blacklistFile) {
+		blacklist, err := ct.ReadLines(blacklistFile)
+		if err != nil {
+			return fmt.Errorf("failed to read blacklist: %w", err)
+		}
+		
+		for _, id := range blacklist {
+			if strings.TrimSpace(id) == wallpaperID {
+				return nil
+			}
+		}
+	}
+	
+	return ct.AppendStringToFile(blacklistFile, wallpaperID+"\n")
+}
+
+func (ct *CacheTools) GetBlacklist() ([]string, error) {
+	blacklistFile := "blacklist.txt"
+	
+	if !ct.FileExists(blacklistFile) {
+		return []string{}, nil
+	}
+	
+	blacklist, err := ct.ReadLines(blacklistFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read blacklist: %w", err)
+	}
+	
+	var cleanedBlacklist []string
+	for _, id := range blacklist {
+		id = strings.TrimSpace(id)
+		if id != "" {
+			cleanedBlacklist = append(cleanedBlacklist, id)
+		}
+	}
+	
+	return cleanedBlacklist, nil
+}
+
+func (ct *CacheTools) IsBlacklisted(wallpaperID string) (bool, error) {
+	blacklist, err := ct.GetBlacklist()
+	if err != nil {
+		return false, err
+	}
+	
+	return slices.Contains(blacklist, wallpaperID), nil
+}
+
+func (ct *CacheTools) RemoveFromBlacklist(wallpaperID string) error {
+	blacklist, err := ct.GetBlacklist()
+	if err != nil {
+		return err
+	}
+	
+	filtered := make([]string, 0, len(blacklist))
+	for _, id := range blacklist {
+		if id != wallpaperID {
+			filtered = append(filtered, id)
+		}
+	}
+	
+	return ct.WriteLines("blacklist.txt", filtered)
+}
+
 func getSystemCache() string {
 	switch runtime.GOOS {
 	case "windows":

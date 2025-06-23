@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -19,6 +20,8 @@ const (
 	Clean           WallchemyCommand = "clean"
 	Daemon          WallchemyCommand = "daemon"
 	LaunchDaemonCmd WallchemyCommand = "launchdaemon"
+	Blacklist       WallchemyCommand = "blacklist"
+	ListBlacklist   WallchemyCommand = "listblacklist"
 )
 
 func globalFilters(appCtx *app.AppContext) error {
@@ -141,6 +144,14 @@ func parseAction(appCtx *app.AppContext) WallchemyCommand {
 		return Daemon
 	}
 
+	if appCtx.Config.Blacklist != "" {
+		return Blacklist
+	}
+
+	if appCtx.Config.ListBlacklist {
+		return ListBlacklist
+	}
+
 	return ""
 
 }
@@ -167,6 +178,10 @@ func ExecuteCommand(appCtx *app.AppContext) (string, error) {
 		return startDaemon(appCtx)
 	case Daemon:
 		return HandleDaemon(appCtx)
+	case Blacklist:
+		return handleBlacklist(appCtx)
+	case ListBlacklist:
+		return handleListBlacklist(appCtx)
 	default:
 		return "", fmt.Errorf("no valid action found")
 	}
@@ -177,4 +192,66 @@ func handleClean(appCtx *app.AppContext) (string, error) {
 	appCtx.CacheTools.Clean()
 	app.Logger.WithField("cache dir", appCtx.CacheTools.GetCacheDirectory()).Debug("action received")
 	return appCtx.CacheTools.GetCacheDirectory() + " cleaned", nil
+}
+
+func handleBlacklist(appCtx *app.AppContext) (string, error) {
+	wallpaperID := appCtx.Config.Blacklist
+	
+	if wallpaperID == "current" {
+		currentWallpaperID, err := getCurrentWallpaperID(appCtx)
+		if err != nil {
+			return "", fmt.Errorf("failed to get current wallpaper ID: %w", err)
+		}
+		wallpaperID = currentWallpaperID
+	}
+	
+	if err := appCtx.CacheTools.AddToBlacklist(wallpaperID); err != nil {
+		app.Logger.WithError(err).Error("Failed to add wallpaper to blacklist")
+		return "", fmt.Errorf("failed to add wallpaper %s to blacklist: %w", wallpaperID, err)
+	}
+	
+	app.Logger.WithField("wallpaper_id", wallpaperID).Info("Added wallpaper to blacklist")
+	return fmt.Sprintf("Added wallpaper %s to blacklist", wallpaperID), nil
+}
+
+func handleListBlacklist(appCtx *app.AppContext) (string, error) {
+	blacklist, err := appCtx.CacheTools.GetBlacklist()
+	if err != nil {
+		app.Logger.WithError(err).Error("Failed to retrieve blacklist")
+		return "", fmt.Errorf("failed to retrieve blacklist: %w", err)
+	}
+	
+	if len(blacklist) == 0 {
+		return "No wallpapers in blacklist", nil
+	}
+	
+	result := fmt.Sprintf("Blacklisted wallpapers (%d):\n", len(blacklist))
+	for _, id := range blacklist {
+		result += fmt.Sprintf("- %s\n", id)
+	}
+	
+	app.Logger.WithField("blacklist_count", len(blacklist)).Info("Listed blacklisted wallpapers")
+	return result, nil
+}
+
+func getCurrentWallpaperID(appCtx *app.AppContext) (string, error) {
+	if !appCtx.CacheTools.FileExists("current") {
+		return "", fmt.Errorf("no current wallpaper found")
+	}
+
+	infoBytes, err := appCtx.CacheTools.ReadFileBytes("current")
+	if err != nil {
+		return "", fmt.Errorf("failed to read current wallpaper info: %w", err)
+	}
+
+	var current app.CurrentWallpaper
+	if err := json.Unmarshal(infoBytes, &current); err != nil {
+		return "", fmt.Errorf("failed to parse current wallpaper info: %w", err)
+	}
+
+	if current.ID == "" {
+		return "", fmt.Errorf("current wallpaper has no ID")
+	}
+
+	return current.ID, nil
 }

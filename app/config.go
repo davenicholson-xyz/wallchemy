@@ -42,6 +42,8 @@ type Config struct {
 	Daemon        string   `mapstructure:"daemon"`
 	LaunchDaemon  bool     `mapstructure:"launchdaemon"`
 	Port          int      `mapstructure:"port"`
+	Blacklist     string   `mapstructure:"blacklist"`
+	ListBlacklist bool     `mapstructure:"listblacklist"`
 }
 
 func setupFlags() {
@@ -85,6 +87,9 @@ func setupFlags() {
 	pflag.StringP("daemon", "d", "", "Start the background daemon for browser extension support")
 	pflag.Bool("launchdaemon", false, "")
 	pflag.IntP("port", "p", 2388, "Port for the backgorund daemon to listen on.")
+
+	pflag.StringP("blacklist", "b", "", "Add wallpaper ID to blacklist (use 'current' to blacklist currently set wallpaper)")
+	pflag.Bool("listblacklist", false, "List all blacklisted wallpaper IDs")
 
 	pflag.CommandLine.MarkHidden("launchdaemon")
 
@@ -172,6 +177,8 @@ EXECUTION:
 UTILITIES:
   -I, --info                        Show current wallpaper info
   -x, --clean                       Clean cache directory
+  -b, --blacklist <id|current>      Add wallpaper ID to blacklist (use 'current' for current wallpaper)
+      --listblacklist               List all blacklisted wallpapers
   -v, --version                     Show version
   -h, --help                        Show this help
 
@@ -188,6 +195,8 @@ EXAMPLES:
   wallchemy --id ox83dp3
   wallchemy --collection "my Favorites"
   wallchemy --random "cyberpunk" --colors 00ffff --ratios 21x9
+  wallchemy --blacklist ox83dp3
+  wallchemy --blacklist current
 
 EXAMPLE CONFIG FILE - config.yml:
     apikey: "your-api-key-here"
