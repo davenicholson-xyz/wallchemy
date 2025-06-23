@@ -76,6 +76,7 @@ wallchemy --hot --categories general --purity sfw,sketchy
 
 # Get top wallpaper from the last week
 wallchemy --top --range 1w --minresolution 2560x1440
+```
 
 ### With API Key (Required for Collections & NSFW)
 ```bash
