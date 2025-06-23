@@ -76,7 +76,6 @@ wallchemy --hot --categories general --purity sfw,sketchy
 
 # Get top wallpaper from the last week
 wallchemy --top --range 1w --minresolution 2560x1440
-```
 
 ### With API Key (Required for Collections & NSFW)
 ```bash
@@ -117,6 +116,12 @@ wallchemy --apikey "your-api-key" --username "yourusername" --collection "my fav
 | `--stealth` | Download but don't set wallpaper |
 | `-e, --expiry <seconds>` | Cache expiry time (default: 600) |
 | `-p, --pages <num>` | Max API pages to fetch (default: 5) |
+
+### Blacklist Management
+| Flag | Description |
+|------|-------------|
+| `-b, --blacklist <id\|current>` | Add wallpaper to blacklist |
+| `--listblacklist` | List all blacklisted wallpapers |
 
 ### Utilities
 | Flag | Description |
